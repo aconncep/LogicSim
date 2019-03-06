@@ -28,6 +28,8 @@ namespace LogicSim
         // This is used to make sure the user does not try to use a local variable that has not been declared.
         private List<string> declaredLocalVars = new List<string>();
 
+        private List<Variable> allArgVars = new List<Variable>();
+
         int currentLineNum = 0; // the current line number being processed, used for reporting errors to the user
 
         /// <summary>
@@ -168,6 +170,8 @@ namespace LogicSim
             
             // populate the outputVariables list
             SetOutputVariables();
+            
+            CheckFileForWarnings();
             
             return new FileData(localVars, inputVariables);
         }
@@ -321,6 +325,38 @@ namespace LogicSim
                 }
             }
         }
+
+        /// <summary>
+        /// Checks a file for warnings such as
+        /// 1. Variable is declared that is never used
+        /// </summary>
+        private void CheckFileForWarnings()
+        {
+            foreach (ICommand command in localVars.Values)
+            {
+                foreach (Variable var in command.GetVariables())
+                {
+                    allArgVars.Add(var);
+                } 
+            }
+            
+            foreach (Variable var in inputVariables)
+            {
+                if (!localVars.ContainsKey(var) && !allArgVars.Contains(var))
+                {
+                    Console.WriteLine("Warning: Input variable [" + var.name + "] is assigned but never used");
+                }
+            }
+
+            foreach (Variable var in localVars.Keys)
+            {
+                if (!allArgVars.Contains(var) && !outputVariables.Contains(var))
+                {
+                    Console.WriteLine("Warning: Local variable [" + var.name + "] is assigned but never used");
+                }
+            }
+        }
+        
 
 
 

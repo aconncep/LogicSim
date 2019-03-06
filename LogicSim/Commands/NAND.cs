@@ -1,11 +1,12 @@
-﻿using System;
+using System;
 namespace LogicSim.Commands
 {
-    public class AND : ICommand
+    public class NAND : ICommand
     {
         Variable[] variables;
 
-        public AND() { }
+        public NAND() { }
+
         public int ExpectedNumArguments()
         {
             return 2;
@@ -20,21 +21,19 @@ namespace LogicSim.Commands
         {
             if (variables[0].value == 1 && variables[1].value == 1)
             {
-                return 1;
+                return 0;
             }
-            return 0;
+            return 1;
         }
 
         public Variable[] GetVariables()
         {
             return variables;
         }
-        
-        
 
         public override string ToString()
         {
-            return "AND";
+            return "OR";
         }
     }
 }

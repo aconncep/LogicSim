@@ -15,6 +15,7 @@ namespace LogicSim
         public string name;
         public int value { get; private set; } = 0; // by default new variables are 0
         public bool shouldOutput;
+        public bool isUsed = false;
 
         public Variable(VarType varType, string name, bool shouldOutput)
         {

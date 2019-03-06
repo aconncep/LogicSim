@@ -24,8 +24,9 @@ namespace LogicSim
 
         public List<Variable> ComputeCircuit()
         {
-            initAllArgVars();
+            InitAllArgVars();
             initAllInputVars();
+            
             ComputeLocalVars();
             List<Variable> allVariablesOutput = new List<Variable>();
             foreach (Variable var in inputVariables)
@@ -56,13 +57,12 @@ namespace LogicSim
         }
         
 
-        private void initAllArgVars()
+        private void InitAllArgVars()
         {
             foreach (ICommand command in localVariables.Values)
             {
                 foreach (Variable var in command.GetVariables())
                 {
-                    Console.WriteLine(var.GetHashCode()); // debug purposes
                     allArgVars.Add(var);
                 }
                 

@@ -7,12 +7,6 @@ namespace LogicSim.Commands
 
         public NOT() { }
 
-        public NOT(Variable[] vars)
-        {
-            variables = new Variable[] { vars[0] };
-
-        }
-
         public void SetVariableValues(Variable[] vars)
         {
             variables = new Variable[] { vars[0] };
@@ -26,17 +20,6 @@ namespace LogicSim.Commands
         public int ExpectedNumArguments()
         {
             return 1;
-        }
-        
-        public void UpdateVariables(Variable variable)
-        {
-            foreach (Variable var in variables)
-            {
-                if (var.name == variable.name)
-                {
-                    var.SetValue(variable.value);
-                }
-            }
         }
         
         public Variable[] GetVariables()
