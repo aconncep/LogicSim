@@ -1,0 +1,11 @@
+/Users/austincepalia/Projects/LogicSim/LogicSim/bin/Debug/netcoreapp2.1/LogicSim.deps.json
+/Users/austincepalia/Projects/LogicSim/LogicSim/bin/Debug/netcoreapp2.1/LogicSim.runtimeconfig.json
+/Users/austincepalia/Projects/LogicSim/LogicSim/bin/Debug/netcoreapp2.1/LogicSim.runtimeconfig.dev.json
+/Users/austincepalia/Projects/LogicSim/LogicSim/bin/Debug/netcoreapp2.1/LogicSim.dll
+/Users/austincepalia/Projects/LogicSim/LogicSim/bin/Debug/netcoreapp2.1/LogicSim.pdb
+/Users/austincepalia/Projects/LogicSim/LogicSim/obj/Debug/netcoreapp2.1/LogicSim.csprojAssemblyReference.cache
+/Users/austincepalia/Projects/LogicSim/LogicSim/obj/Debug/netcoreapp2.1/LogicSim.csproj.CoreCompileInputs.cache
+/Users/austincepalia/Projects/LogicSim/LogicSim/obj/Debug/netcoreapp2.1/LogicSim.AssemblyInfoInputs.cache
+/Users/austincepalia/Projects/LogicSim/LogicSim/obj/Debug/netcoreapp2.1/LogicSim.AssemblyInfo.cs
+/Users/austincepalia/Projects/LogicSim/LogicSim/obj/Debug/netcoreapp2.1/LogicSim.dll
+/Users/austincepalia/Projects/LogicSim/LogicSim/obj/Debug/netcoreapp2.1/LogicSim.pdb

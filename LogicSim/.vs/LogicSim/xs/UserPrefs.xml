@@ -1,0 +1,33 @@
+﻿<Properties StartupConfiguration="{1AEEF889-F9E9-4FEB-B798-E430132ABFC2}|Default">
+  <MonoDevelop.Ide.ItemProperties.LogicSim PreferredExecutionTarget="MonoDevelop.Default" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Program.cs">
+    <Files>
+      <File FileName="Computer.cs" Line="45" Column="37" />
+      <File FileName="Program.cs" Line="56" Column="1" />
+      <File FileName="Variable.cs" Line="52" Column="26" />
+      <File FileName="Commands/ICommand.cs" Line="9" Column="17" />
+      <File FileName="Commands/NOT.cs" Line="15" Column="28" />
+      <File FileName="FileData.cs" Line="12" Column="10" />
+      <File FileName="test.txt" Line="5" Column="12" />
+      <File FileName="Commands/AND.cs" Line="35" Column="26" />
+    </Files>
+    <Pads>
+      <Pad Id="ProjectPad">
+        <State name="__root__">
+          <Node name="LogicSim" expanded="True">
+            <Node name="LogicSim" expanded="True">
+              <Node name="Commands" expanded="True" />
+              <Node name="Program.cs" selected="True" />
+            </Node>
+          </Node>
+        </State>
+      </Pad>
+    </Pads>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MultiItemStartupConfigurations />
+</Properties>

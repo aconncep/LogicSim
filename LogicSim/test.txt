@@ -1,0 +1,16 @@
+﻿# Test program
+
+INPUTS A,B
+
+w1 = NOT(A)
+w2 = NOT(B)
+OUTPUT A
+OUTPUT B
+w3 = AND(A,B)
+w4 = AND(w1,w2)
+
+OUTPUT w1,w2,w4
+OUTPUT w3
+
+# inputVars(A,B)
+# localVars(w1 - NOT(A), w2 - NOT(B), w3 - AND(A,B), w4 - AND(w1,w2))
