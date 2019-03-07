@@ -13,7 +13,7 @@ namespace LogicSim
     /// </summary>
     public class FileReader
     {
-        private string pathToFile;
+        private string[] lines;
 
         // Stores the local output variable (w1,w2,...) as the key, and the command (w/ associated input variables) as the value
         private Dictionary<Variable, ICommand> localVars = new Dictionary<Variable, ICommand>();
@@ -38,7 +38,7 @@ namespace LogicSim
         /// <param name="pathToFile"></param>
         public FileReader(string pathToFile)
         {
-            this.pathToFile = pathToFile;
+            lines = File.ReadAllLines(pathToFile);
         }
 
         /// <summary>
@@ -48,7 +48,7 @@ namespace LogicSim
         /// <exception cref="CompilationException">If there is an issue with the input file</exception>
         public FileData GenerateFileData()
         {
-            string[] lines = File.ReadAllLines(pathToFile);
+            
 
             // we assume that the file does not have these two required lines. If we find them, the variable changes to true
             bool hasInputsLine = false;
