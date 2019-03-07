@@ -1,4 +1,5 @@
 using System.Net;
+using System.Resources;
 
 namespace LogicSim.Commands
 {
@@ -24,6 +25,9 @@ namespace LogicSim.Commands
                 
                 case "NOR":
                     return new NOR();
+                
+                case "NAND":
+                    return new NAND();
                 
                 default: // if the users desired command is not valid
                     throw new CompilationException("[" + commandString + "] is an invalid command", lineNumber);

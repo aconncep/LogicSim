@@ -1,7 +1,6 @@
 ﻿# Test program
 
-INPUTS A,B,C,D
+INPUTS A,B
 w1 = OR(A,B)
 w2 = AND(w1,B)
-w3 = AND(A,B)
 OUTPUT w1,w2
