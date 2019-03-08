@@ -19,6 +19,7 @@ namespace LogicSim
                 {
                     Console.WriteLine("Error: File not found");
                     Environment.Exit(1);
+                    // comment
                 }
 
                 FileData fileData = null;
