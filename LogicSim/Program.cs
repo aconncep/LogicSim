@@ -14,6 +14,7 @@ namespace LogicSim
                 try
                 {
                     reader = new FileReader(args[0]);  
+                    BREAKINGTHEBUILD
                 }
                 catch (FileNotFoundException)
                 {
