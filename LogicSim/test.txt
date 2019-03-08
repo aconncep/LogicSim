@@ -1,6 +1,16 @@
 ﻿# Test program
 
-INPUTS A,B
-w1 = OR(A,B)
-w2 = AND(w1,B)
-OUTPUT w1,w2
+INPUTS A,B,C,D,E,F,G
+w1 = AND(A,B)
+w2 = NAND(B,C)
+w3 = NOR(C,E)
+w4 = NOT(E)
+w5 = NOR(w3,w4)
+w6 = NOT(E)
+w7 = AND(E,w4)
+w8 = OR(F,w3)
+w9 = NAND(w6,w7)
+w10 = NAND(w9,w2)
+OUTPUT w10
+
+# new comment
