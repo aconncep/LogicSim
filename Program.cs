@@ -79,34 +79,37 @@ namespace LogicSim
 
         static void RunManual(FileData fileData)
         {
-
-            int currentVariableIdx = 0;
-            
-            while (currentVariableIdx < fileData.inputVariables.Count)
+            while (true)
             {
-                Console.Write("Enter value for input variable " + fileData.inputVariables[currentVariableIdx].name + ": ");
-                string userInput = Console.ReadLine();
-                int userInt = 0;
-                if (userInput == "0")
-                {
-                    userInt = 0;
-                }
-                else if (userInput == "1")
-                {
-                    userInt = 1;
-                }
-                else
-                {
-                    Console.WriteLine("Invalid input!");
-                    continue;
-                }
-                fileData.inputVariables[currentVariableIdx].SetValue(userInt);
-                currentVariableIdx++;
-            }
+                int currentVariableIdx = 0;
 
-            Console.WriteLine();
-            ComputeAndDisplay(fileData, true);
-            Console.WriteLine();
+                while (currentVariableIdx < fileData.inputVariables.Count)
+                {
+                    Console.Write("Enter value for input variable " + fileData.inputVariables[currentVariableIdx].name +
+                                  ":  ");
+                    char userInput = Console.ReadKey().KeyChar;
+                    if (userInput.Equals('x'))
+                    {
+                        Console.WriteLine();
+                        Console.WriteLine("Exiting...");
+                        Environment.Exit(0);
+                    }
+                    else if (!userInput.Equals('0') && !userInput.Equals('1'))
+                    {
+                        Console.WriteLine();
+                        Console.WriteLine("Invalid input!");
+                        continue;
+                    }
+
+                    fileData.inputVariables[currentVariableIdx].SetValue(userInput);
+                    currentVariableIdx++;
+                    Console.WriteLine();
+                }
+
+                Console.WriteLine();
+                ComputeAndDisplay(fileData, true);
+                Console.WriteLine();
+            }
         }
 
         static void RunAuto(FileData fileData, bool verbose)
@@ -178,10 +181,12 @@ namespace LogicSim
                     if (verbose)
                     {
                         Console.Write("Output variable " + var.name + ": " + var.value + "  ");
+                        Console.WriteLine();
                     }
                     else
                     {
                         Console.Write(var.value + "  ");
+                        Console.WriteLine();
                     }
                 }
             }
