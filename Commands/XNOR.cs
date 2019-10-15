@@ -1,11 +1,11 @@
-using System;
+﻿using System;
 namespace LogicSim.Commands
 {
-    public class NAND : ICommand
+    public class XNOR : ICommand
     {
         Variable[] variables;
 
-        public NAND() { }
+        public XNOR() { }
 
         public int ExpectedNumArguments()
         {
@@ -19,7 +19,7 @@ namespace LogicSim.Commands
 
         public int Evaluate()
         {
-            if (variables[0].value == 1 && variables[1].value == 1)
+            if (variables[0].value == 0 && variables[1].value == 1 || variables[0].value == 1 && variables[1].value == 0)
             {
                 return 0;
             }
@@ -33,7 +33,7 @@ namespace LogicSim.Commands
 
         public override string ToString()
         {
-            return "OR";
+            return "XNOR";
         }
     }
 }

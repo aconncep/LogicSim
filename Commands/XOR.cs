@@ -1,11 +1,12 @@
 ﻿using System;
 namespace LogicSim.Commands
 {
-    public class AND : ICommand
+    public class XOR : ICommand
     {
         Variable[] variables;
 
-        public AND() { }
+        public XOR() { }
+
         public int ExpectedNumArguments()
         {
             return 2;
@@ -18,7 +19,7 @@ namespace LogicSim.Commands
 
         public int Evaluate()
         {
-            if (variables[0].value == 1 && variables[1].value == 1)
+            if (variables[0].value == 0 && variables[1].value == 1 || variables[0].value == 1 && variables[1].value == 0)
             {
                 return 1;
             }
@@ -29,12 +30,10 @@ namespace LogicSim.Commands
         {
             return variables;
         }
-        
-        
 
         public override string ToString()
         {
-            return "AND";
+            return "XOR";
         }
     }
 }
