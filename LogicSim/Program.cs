@@ -8,7 +8,7 @@ namespace LogicSim
     {
         static void Main(string[] args)
         {
-            if (args.Length == 2)
+            if (args.Length == 3)
             {
                 FileReader reader = null;
                 try
@@ -19,7 +19,6 @@ namespace LogicSim
                 {
                     Console.WriteLine("Error: File not found");
                     Environment.Exit(1);
-                    // comment
                 }
 
                 FileData fileData = null;
@@ -36,40 +35,97 @@ namespace LogicSim
 
                 if (String.Equals(args[1], "auto", StringComparison.Ordinal))
                 {
-                    RunAuto(fileData);
+                    if (String.Equals(args[2], "verbose", StringComparison.Ordinal))
+                    {
+                        RunAuto(fileData, true);
+                    }
+                    else if (String.Equals(args[2], "simple", StringComparison.Ordinal))
+                    {
+                        RunAuto(fileData, false);
+                    }
+                    else
+                    {
+                        Console.WriteLine("Usage: LogicSim [path_to_file] [auto/manual] [verbose/simple]");
+                    }
+
+
                 }
                 else if (String.Equals(args[1], "manual", StringComparison.Ordinal))
                 {
-                    RunManual(fileData);
+                    if (String.Equals(args[2], "verbose", StringComparison.Ordinal))
+                    {
+                        RunManual(fileData);
+                    }
+                    else if (String.Equals(args[2], "simple", StringComparison.Ordinal))
+                    {
+                        Console.WriteLine("Manual simple mode is not supported. Using manual verbose instead...");
+                        RunManual(fileData);
+                    }
+                    else
+                    {
+                        Console.WriteLine("Usage: LogicSim [path_to_file] [auto/manual] [verbose/simple]");
+                    }
                 }
                 else
                 {
-                    Console.WriteLine("Usage: LogicSim [path_to_file] [auto/manual]");
+                    Console.WriteLine("Usage: LogicSim [path_to_file] [auto/manual] [verbose/simple]");
                 }
             }
             else
             {
-                Console.WriteLine("Usage: LogicSim [path_to_file] [auto/manual]");
+                Console.WriteLine("Usage: LogicSim [path_to_file] [auto/manual] [verbose/simple]");
             }
         }
 
         static void RunManual(FileData fileData)
         {
-            int idx = 0;
-            foreach (Variable var in fileData.inputVariables)
-            {
-                Console.WriteLine("Enter value for variable " + var.name + ":");
-                fileData.inputVariables[idx].SetValue(Convert.ToInt16(Console.ReadLine()));
-                idx++;
-            }
+
+            int currentVariableIdx = 0;
             
-            ComputeAndDisplay(fileData);
+            while (currentVariableIdx < fileData.inputVariables.Count)
+            {
+                Console.Write("Enter value for input variable " + fileData.inputVariables[currentVariableIdx].name + ": ");
+                string userInput = Console.ReadLine();
+                int userInt = 0;
+                if (userInput == "0")
+                {
+                    userInt = 0;
+                }
+                else if (userInput == "1")
+                {
+                    userInt = 1;
+                }
+                else
+                {
+                    Console.WriteLine("Invalid input!");
+                    continue;
+                }
+                fileData.inputVariables[currentVariableIdx].SetValue(userInt);
+                currentVariableIdx++;
+            }
+
+            Console.WriteLine();
+            ComputeAndDisplay(fileData, true);
             Console.WriteLine();
         }
 
-        static void RunAuto(FileData fileData)
+        static void RunAuto(FileData fileData, bool verbose)
         {
             int numInputs = fileData.inputVariables.Count;
+            foreach (Variable var in fileData.inputVariables)
+            {
+                Console.Write(var.name + " ");
+            }
+            Console.Write(" | ");
+
+            foreach (var var in fileData.localVariables)
+            {
+                if (var.Key.shouldOutput)
+                {
+                    Console.Write(var.Key.name + " ");
+                }
+            }
+            Console.WriteLine();
             for (int i = 0; i < Math.Pow(2, numInputs); i++)
             {
                 string binaryStr = Convert.ToString(i, 2).PadLeft(numInputs, '0');
@@ -81,21 +137,36 @@ namespace LogicSim
                     idx++;
                 }
 
-               
-                Console.Write("Current variables: ");
-                foreach (Variable var in fileData.inputVariables)
+                if (verbose)
                 {
-                    Console.Write(var.name + ": " + var.value + "   " );
-                    
+                    Console.WriteLine();
+
+                    Console.Write("Current input variables: ");
+                    foreach (Variable var in fileData.inputVariables)
+                    {
+                        Console.Write(var.name + ": " + var.value + "   ");
+
+                    }
+                    Console.WriteLine();
+                    ComputeAndDisplay(fileData, verbose);
+                    Console.WriteLine();
                 }
-                Console.WriteLine();
-                ComputeAndDisplay(fileData);
-                Console.WriteLine();
+                else
+                {
+                    foreach (Variable var in fileData.inputVariables)
+                    {
+                        Console.Write(var.value + " ");
+                    }
+                    Console.Write(" | ");
+                    ComputeAndDisplay(fileData, verbose);
+                    Console.WriteLine();
+                }  
+                
             }
             
         }
 
-        static void ComputeAndDisplay(FileData fileData)
+        static void ComputeAndDisplay(FileData fileData, bool verbose)
         {
             Computer computer = new Computer(fileData);
             List<Variable> simOutput = computer.ComputeCircuit();
@@ -104,7 +175,14 @@ namespace LogicSim
             {
                 if (var.shouldOutput)
                 {
-                    Console.WriteLine(var);               
+                    if (verbose)
+                    {
+                        Console.Write("Output variable " + var.name + ": " + var.value + "  ");
+                    }
+                    else
+                    {
+                        Console.Write(var.value + "  ");
+                    }
                 }
             }
         }

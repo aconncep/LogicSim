@@ -28,6 +28,12 @@ namespace LogicSim.Commands
                 
                 case "NAND":
                     return new NAND();
+
+                case "XOR":
+                    return new XOR();
+
+                case "XNOR":
+                    return new XNOR();
                 
                 default: // if the users desired command is not valid
                     throw new CompilationException("[" + commandString + "] is an invalid command", lineNumber);
