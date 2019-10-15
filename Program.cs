@@ -101,7 +101,7 @@ namespace LogicSim
                         continue;
                     }
 
-                    fileData.inputVariables[currentVariableIdx].SetValue(userInput);
+                    fileData.inputVariables[currentVariableIdx].SetValue(userInput - 48);
                     currentVariableIdx++;
                     Console.WriteLine();
                 }
@@ -181,7 +181,6 @@ namespace LogicSim
                     if (verbose)
                     {
                         Console.Write("Output variable " + var.name + ": " + var.value + "  ");
-                        Console.WriteLine();
                     }
                     else
                     {
