@@ -186,7 +186,6 @@ namespace LogicSim
                     else
                     {
                         Console.Write(var.value + "  ");
-                        Console.WriteLine();
                     }
                 }
             }
