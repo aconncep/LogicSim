@@ -86,7 +86,7 @@ namespace LogicSim
                 while (currentVariableIdx < fileData.inputVariables.Count)
                 {
                     Console.Write("Enter value for input variable " + fileData.inputVariables[currentVariableIdx].name +
-                                  ":  ");
+                                  " [or x to quit]:  ");
                     char userInput = Console.ReadKey().KeyChar;
                     if (userInput.Equals('x'))
                     {
@@ -114,21 +114,26 @@ namespace LogicSim
 
         static void RunAuto(FileData fileData, bool verbose)
         {
+            Console.WriteLine("Simulating circuit...");
             int numInputs = fileData.inputVariables.Count;
-            foreach (Variable var in fileData.inputVariables)
-            {
-                Console.Write(var.name + " ");
-            }
-            Console.Write(" | ");
 
-            foreach (var var in fileData.localVariables)
+            if (!verbose)
             {
-                if (var.Key.shouldOutput)
+                foreach (Variable var in fileData.inputVariables)
                 {
-                    Console.Write(var.Key.name + " ");
+                    Console.Write(var.name + " ");
+                }
+                Console.Write(" | ");
+
+                foreach (var var in fileData.localVariables)
+                {
+                    if (var.Key.shouldOutput)
+                    {
+                        Console.Write(var.Key.name + " ");
+                    }
                 }
             }
-            Console.WriteLine();
+            
             for (int i = 0; i < Math.Pow(2, numInputs); i++)
             {
                 string binaryStr = Convert.ToString(i, 2).PadLeft(numInputs, '0');

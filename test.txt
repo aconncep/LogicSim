@@ -6,6 +6,6 @@ w1 = AND(A,B)
 w2 = NOT(w1)
 w3 = NAND(C,w2)
 
-OUTPUT w3
+OUTPUT w3,w1
 
 # test comment, should be ignored
