@@ -132,6 +132,8 @@ namespace LogicSim
                         Console.Write(var.Key.name + " ");
                     }
                 }
+
+                Console.WriteLine();
             }
             
             for (int i = 0; i < Math.Pow(2, numInputs); i++)
