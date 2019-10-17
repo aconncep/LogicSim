@@ -33,7 +33,7 @@ namespace LogicSim.Commands
 
         public override string ToString()
         {
-            return "OR";
+            return "NAND";
         }
     }
 }

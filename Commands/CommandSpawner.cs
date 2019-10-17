@@ -6,7 +6,7 @@ namespace LogicSim.Commands
     /// <summary>
     /// Takes the string representation of a command and creates a new command object of that command type
     /// (for example, this can turn the string "NOT" into a new NOT object)
-    /// NOTE: This returns a blank command. It's arguments need to be set manually
+    /// NOTE: This returns a blank command. Its arguments need to be set manually
     /// </summary>
     public static class CommandSpawner
     {
