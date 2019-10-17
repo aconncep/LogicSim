@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Windows.Input;
+using LogicSim.Commands;
 
 namespace LogicSim
 {
@@ -12,7 +14,7 @@ namespace LogicSim
     /// </summary>
     public class Computer
     {
-        readonly Dictionary<Variable, ICommand> localVariables;
+        readonly Dictionary<Variable, Command> localVariables;
         readonly List<Variable> inputVariables; 
         List<Variable> allArgVars = new List<Variable>();
 
@@ -42,12 +44,14 @@ namespace LogicSim
 
         }
         
+        
+        
         // fill allArgVars list with all the variables found in command arguments
         private void InitAllArgVars()
         {
-            foreach (ICommand command in localVariables.Values)
+            foreach (Command command in localVariables.Values)
             {
-                foreach (Variable var in command.GetVariables())
+                foreach (Variable var in command.Variables)
                 {
                     allArgVars.Add(var);
                 }
@@ -77,7 +81,7 @@ namespace LogicSim
             foreach (Variable var in localVariables.Keys)
             {
                 // try to get the associated command with each value
-                if (localVariables.TryGetValue(var, out ICommand command))
+                if (localVariables.TryGetValue(var, out Command command))
                 {
                     var.SetValue(command.Evaluate());
                     

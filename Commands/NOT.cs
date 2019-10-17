@@ -1,33 +1,21 @@
 ﻿using System;
 namespace LogicSim.Commands
 {
-    public class NOT : ICommand
+    public class NOT : Command
     {
-        Variable[] variables;
-
-        public NOT() { }
-
-        public void SetVariableValues(Variable[] vars)
+        public override Variable[] Variables { get; } = new Variable[1];
+        
+        public override int Evaluate()
         {
-            variables = new Variable[] { vars[0] };
+           Variables[0].FlipValue();
+           return Variables[0].value;
         }
 
-        public int Evaluate()
-        {
-           variables[0].FlipValue();
-           return variables[0].value;
-        }
-
-        public int ExpectedNumArguments()
+        public override int ExpectedNumArguments()
         {
             return 1;
         }
         
-        public Variable[] GetVariables()
-        {
-            return variables;
-        }
-
         public override string ToString()
         {
             return "NOT";

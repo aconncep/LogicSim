@@ -1,34 +1,21 @@
 using System;
 namespace LogicSim.Commands
 {
-    public class OR : ICommand
+    public class OR : Command
     {
-        Variable[] variables;
-
-        public OR() { }
-
-        public int ExpectedNumArguments()
+        
+        public override int ExpectedNumArguments()
         {
             return 2;
         }
 
-        public void SetVariableValues(Variable[] vars)
+        public override int Evaluate()
         {
-            variables = new Variable[] { vars[0], vars[1] };
-        }
-
-        public int Evaluate()
-        {
-            if (variables[0].value == 1 || variables[1].value == 1)
+            if (Variables[0].value == 1 || Variables[1].value == 1)
             {
                 return 1;
             }
             return 0;
-        }
-
-        public Variable[] GetVariables()
-        {
-            return variables;
         }
 
         public override string ToString()

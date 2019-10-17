@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using LogicSim.Commands;
 
 namespace LogicSim
 {
@@ -8,10 +9,10 @@ namespace LogicSim
     /// </summary>
     public class FileData
     {
-        public readonly Dictionary<Variable, ICommand> localVariables;
+        public readonly Dictionary<Variable, Command> localVariables;
         public readonly List<Variable> inputVariables;
 
-        public FileData(Dictionary<Variable, ICommand> localVariables, List<Variable> inputVariables)
+        public FileData(Dictionary<Variable, Command> localVariables, List<Variable> inputVariables)
         {
             this.localVariables = localVariables;
             this.inputVariables = inputVariables;

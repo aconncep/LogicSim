@@ -10,7 +10,7 @@ namespace LogicSim.Commands
     /// </summary>
     public static class CommandSpawner
     {
-        public static ICommand GetCommandObjectFromString(string commandString, int lineNumber)
+        public static Command GetCommandObjectFromString(string commandString, int lineNumber)
         {
             switch (commandString)
             {

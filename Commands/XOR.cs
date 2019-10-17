@@ -1,34 +1,20 @@
 ﻿using System;
 namespace LogicSim.Commands
 {
-    public class XOR : ICommand
+    public class XOR : Command
     {
-        Variable[] variables;
-
-        public XOR() { }
-
-        public int ExpectedNumArguments()
+        public override int ExpectedNumArguments()
         {
             return 2;
         }
 
-        public void SetVariableValues(Variable[] vars)
+        public override int Evaluate()
         {
-            variables = new Variable[] { vars[0], vars[1] };
-        }
-
-        public int Evaluate()
-        {
-            if (variables[0].value == 0 && variables[1].value == 1 || variables[0].value == 1 && variables[1].value == 0)
+            if (Variables[0].value == 0 && Variables[1].value == 1 || Variables[0].value == 1 && Variables[1].value == 0)
             {
                 return 1;
             }
             return 0;
-        }
-
-        public Variable[] GetVariables()
-        {
-            return variables;
         }
 
         public override string ToString()

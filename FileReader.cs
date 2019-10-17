@@ -16,7 +16,7 @@ namespace LogicSim
         private string[] lines;
 
         // Stores the local output variable (w1,w2,...) as the key, and the command (w/ associated input variables) as the value
-        private Dictionary<Variable, ICommand> localVars = new Dictionary<Variable, ICommand>();
+        private Dictionary<Variable, Command> localVars = new Dictionary<Variable, Command>();
         
         // List of all the input variables declared in the INPUTS line
         private List<Variable> inputVariables = new List<Variable>();
@@ -126,7 +126,7 @@ namespace LogicSim
                     
                     // get the string representation of the desired command, then creates a command object from it
                     string commandName = GetCommandName(currentLine);
-                    ICommand desiredCommand = CommandSpawner.GetCommandObjectFromString(commandName, currentLineNum);
+                    Command desiredCommand = CommandSpawner.GetCommandObjectFromString(commandName, currentLineNum);
               
 
                     string[] arguments = GetArgumentsList(currentLine, desiredCommand); // get the arguments the user wants to pass to the command
@@ -258,7 +258,7 @@ namespace LogicSim
         }
 
         // Get the list of arguments the user is trying to pass to the command
-        private string[] GetArgumentsList(string line, ICommand command)
+        private string[] GetArgumentsList(string line, Command command)
         {
             string betweenParenthesis = line.Substring(line.IndexOf('(')+1, line.IndexOf(')')-line.IndexOf('(')-1).Trim();
 
@@ -332,9 +332,9 @@ namespace LogicSim
         /// </summary>
         private void CheckFileForWarnings()
         {
-            foreach (ICommand command in localVars.Values)
+            foreach (Command command in localVars.Values)
             {
-                foreach (Variable var in command.GetVariables())
+                foreach (Variable var in command.Variables)
                 {
                     allArgVars.Add(var);
                 } 
