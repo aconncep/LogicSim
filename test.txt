@@ -3,8 +3,7 @@
 INPUTS A,B
 
 w1 = AND(A,B)
-w2 = NOT(w1)
+w2 = NOT(w1) 
+w3 = NAND(w2,B)
 
-OUTPUT w1,w2,A,B
-
-# test comment, should be ignored
+OUTPUT w1,w2 # we don't need to mark input variables as output, but we can anyway
