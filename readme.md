@@ -53,10 +53,10 @@ Running with ./LogicSim circuit.txt auto simple
     Warning: Local variable [w3] is assigned but never used
     Simulating circuit...
     A B  | w1 w2 
-    0 0  | 0  0   
-    0 1  | 1  0   
-    1 0  | 0  0   
-    1 1  | 1  1   
+    0 0  | 0  1   
+    0 1  | 0  1   
+    1 0  | 0  1   
+    1 1  | 1  0   
 
 Running with ./LogicSim circuit.txt manual verbose
 
