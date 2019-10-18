@@ -6,4 +6,5 @@ w1 = AND(A,B)
 w2 = NOT(w1) 
 w3 = NAND(w2,B)
 
+#testing something
 OUTPUT w1,w2 # we don't need to mark input variables as output, but we can anyway
