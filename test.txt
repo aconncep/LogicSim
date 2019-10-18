@@ -5,6 +5,6 @@ INPUTS A,B
 w1 = AND(A,B)
 w2 = NOT(w1)
 
-OUTPUT w1,w2
+OUTPUT w1,w2,A,B
 
 # test comment, should be ignored

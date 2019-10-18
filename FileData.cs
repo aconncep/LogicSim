@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using LogicSim.Commands;
 
 namespace LogicSim
@@ -16,6 +17,15 @@ namespace LogicSim
         {
             this.localVariables = localVariables;
             this.inputVariables = inputVariables;
+        }
+
+        /// <summary>
+        /// Get all the variables in a list, both input and local
+        /// </summary>
+        /// <returns></returns>
+        public List<Variable> GetAllVariables()
+        {
+            return localVariables.Keys.Concat(inputVariables).ToList();
         }
     }
 }

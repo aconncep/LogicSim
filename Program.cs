@@ -124,12 +124,12 @@ namespace LogicSim
                     Console.Write(var.name + " ");
                 }
                 Console.Write(" | ");
-
-                foreach (var var in fileData.localVariables)
+                
+                foreach (var var in fileData.GetAllVariables())
                 {
-                    if (var.Key.shouldOutput)
+                    if (var.shouldOutput)
                     {
-                        Console.Write(var.Key.name + " ");
+                        Console.Write(var.name + " ");
                     }
                 }
 
