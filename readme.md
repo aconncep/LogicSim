@@ -1,4 +1,7 @@
-﻿# What is LogicSim?
+[![Build Status](https://austincepalia.visualstudio.com/LogicSim/_apis/build/status/LogicSim-.NET%20Desktop-CI?branchName=master)](https://austincepalia.visualstudio.com/LogicSim/_build/latest?definitionId=1&branchName=master)
+
+
+# What is LogicSim?
 
 LogicSim is an educational tool used to simulate combinational logic circuits. The software uses a simplified HDL (Hardware Description Language) to interpret circuits composed of various logic gates. LogicSim is written in .NET Core for cross-platform compatibility.
 
