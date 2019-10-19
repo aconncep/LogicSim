@@ -114,6 +114,7 @@ namespace LogicSim
         {
             
             int firstParenthesisIdx = line.IndexOf('(') + 1;
+            int firstCommaIdx = line.IndexOf(',');
             string trimmedLine = line.Substring(line.IndexOf('(')+1);
             int parenthesisCount = 1;
             int idx = 0;
@@ -138,7 +139,14 @@ namespace LogicSim
                 }
             }
 
-            return idx + firstParenthesisIdx;
+            if (firstCommaIdx < firstParenthesisIdx )
+            {
+                return firstCommaIdx;
+            }
+            else
+            {
+                return firstParenthesisIdx + idx;
+            }
         }
     }
 }
