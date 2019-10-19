@@ -2,9 +2,7 @@
 
 INPUTS A,B
 
-w1 = AND(A,B)
-w2 = NOT(w1) 
-w3 = NAND(w2,B)
+w1 = AND(1,OR(1,0))
 
 # Test commit for optimization branch, getting ready to wipe entire project :\
 OUTPUT w1,w2 # we don't need to mark input variables as output, but we can anyway

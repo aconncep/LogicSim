@@ -6,7 +6,7 @@ namespace LogicSim
 {
     class Program
     {
-        public static string[] FileLines { get; private set; }
+        private static string[] FileLines { get; set; }
         static void Main(string[] args)
         {
             Console.WriteLine("LogicSim v2.0 by Austin Cepalia");
@@ -16,12 +16,12 @@ namespace LogicSim
             {
                 FileLines = File.ReadAllLines(args[0]);
             }
-            catch (FileNotFoundException) 
+            catch (FileNotFoundException)
             {
                 Console.WriteLine("Unable to open file " + args[0]);
                 Environment.Exit(1);
-            }
-            
+            } 
+
             // if the wrong number of arguments are provided, ask user for them in console
             if (args.Length != 3)
             {
@@ -40,23 +40,23 @@ namespace LogicSim
                 else if (CompareArgStrings(args[1], "auto") &&
                          CompareArgStrings(args[2], "simple"))
                 {
-                    RunModes.RunAuto(false);
+                    RunModes.RunAuto(false, FileLines);
                 }
                 else if (CompareArgStrings(args[1], "auto") &&
                          CompareArgStrings(args[2], "verbose"))
                 {
-                    RunModes.RunAuto(true);
+                    RunModes.RunAuto(true, FileLines);
                 }
                 else if (CompareArgStrings(args[1], "manual") &&
                          CompareArgStrings(args[2], "simple"))
                 {
                     Console.WriteLine("Manual simple mode is not supported. Running manual verbose instead...");
-                    RunModes.RunManual(true);
+                    RunModes.RunManual(true, FileLines);
                 }
                 else if (CompareArgStrings(args[1], "manual") &&
                          CompareArgStrings(args[2], "verbose"))
                 {
-                    RunModes.RunManual(true);
+                    RunModes.RunManual(true, FileLines);
                 }
                 else
                 {
@@ -65,6 +65,10 @@ namespace LogicSim
             }
         }
 
+        /// <summary>
+        /// If the wrong number of arguments is supplied or an invalid argument is specified
+        /// This is like the fail-safe, but it still requires a valid file
+        /// </summary>
         static void RunWithoutArgs()
         {
             if (FileLines == null)
@@ -73,7 +77,8 @@ namespace LogicSim
                 Environment.Exit(1);
             }
 
-            string[] selections = new string[2];
+            // array of RunLabels to store user inputs
+            RunLabel[] selections = new RunLabel[2];
 
             while (true)
             {
@@ -86,12 +91,12 @@ namespace LogicSim
                 
                 if (userIn == '1')
                 {
-                    selections[0] = "auto";
+                    selections[0] = RunLabel.AUTO;
                     break;
                 }
                 else if (userIn == '2')
                 {
-                    selections[0] = "manual";
+                    selections[0] = RunLabel.MANUAL;
                     break;
                 }
 
@@ -99,7 +104,7 @@ namespace LogicSim
                 Console.WriteLine();
             }
 
-            if (selections[0] == "auto")
+            if (selections[0] == RunLabel.AUTO)
             {
                 while (true)
                 {
@@ -112,12 +117,12 @@ namespace LogicSim
                     
                     if (userIn == '1')
                     {
-                        selections[1] = "verbose";
+                        selections[1] = RunLabel.VERBOSE;
                         break;
                     }
                     else if (userIn == '2')
                     {
-                        selections[1] = "simple";
+                        selections[1] = RunLabel.SIMPLE;
                         break;
                     }
 
@@ -127,16 +132,17 @@ namespace LogicSim
             }
             else // we must use manual verbose, manual simple is not possible
             {
-                RunModes.RunManual(true);
+                RunModes.RunManual(true, FileLines);
             }
 
-            if (selections[0] == "auto" && selections[1] == "simple")
+            // determine the run mode from the entered selections
+            if (selections[0] == RunLabel.AUTO && selections[1] == RunLabel.SIMPLE)
             {
-                RunModes.RunAuto(false);
+                RunModes.RunAuto(false, FileLines);
             }
-            else if (selections[0] == "auto" && selections[1] == "verbose")
+            else if (selections[0] == RunLabel.AUTO && selections[1] == RunLabel.VERBOSE)
             {
-                RunModes.RunAuto(true);
+                RunModes.RunAuto(true, FileLines);
             }
         }
 
