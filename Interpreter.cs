@@ -4,11 +4,15 @@ using System.Collections.Generic;
 namespace LogicSim
 {
     public static class Interpreter
-    { 
+    {
+        private static int currentLine = 0;
+        private static List<string> inputVariables = new List<string>();
         public static void Interpret(string[] fileLines)
         {
             foreach (string line in fileLines)
             {
+                currentLine++;
+                
                 string evalLine = line.Trim();
 
                 if (evalLine.Length == 0)
@@ -21,12 +25,26 @@ namespace LogicSim
                     continue;
                 }
 
+                if (LineStartsWithINPUTS(evalLine))
+                {
+                    string variablesStr = evalLine.Substring(7, evalLine.Length - 7);
+                    Console.WriteLine(variablesStr);
+                    try
+                    {
+                        inputVariables = SplitInputsStringUp(variablesStr);
+                    }
+                    catch (InputVariableException e)
+                    {
+                        Console.WriteLine(e.Message);
+                    }
+                    
+                }
+
                 if (evalLine.Contains('='))
                 {
                     evalLine = TrimVariableAssignment(evalLine);
-                    Console.WriteLine("Line being evaluated: " + evalLine);
 
-                    Console.WriteLine(Computer.ComputeCircuit(evalLine));
+                    int returnValue = Computer.ComputeCircuit(evalLine);
                 }
                 
             }
@@ -37,10 +55,74 @@ namespace LogicSim
             return line[0].ToString() == "#";
         }
 
+        private static bool LineStartsWithINPUTS(string line)
+        {
+            return line.StartsWith("INPUTS ", StringComparison.CurrentCultureIgnoreCase);
+        }
+
         private static string TrimVariableAssignment(string line)
         {
             int equalsIndex = line.IndexOf('=');
             return line.Substring(equalsIndex+1, (line.Length-1)-equalsIndex).Trim();
+        }
+
+        private static List<string> SplitInputsStringUp(string inputString)
+        {
+            string thisVar = "";
+
+            int idx = 0;
+            
+            foreach (char c in inputString)
+            {
+                if (c != 44) // if the character is not a comma
+                {
+                    thisVar += c;
+                    if (idx == inputString.Length - 1)
+                    {
+                        if (!InputAlreadyInList(thisVar))
+                        {
+                            inputVariables.Add(thisVar);
+                            thisVar = "";
+                        }
+                        else
+                        {
+                            throw new InputVariableException(currentLine, thisVar);
+                        }
+                        
+                    }
+                }
+                else
+                {
+                    if (!InputAlreadyInList(thisVar))
+                    {
+                        inputVariables.Add(thisVar);
+                        thisVar = "";
+                    }
+                    else
+                    {
+                        throw new InputVariableException(currentLine, thisVar);
+                    }
+                }
+
+                idx++;
+
+            }
+
+            return inputVariables;
+        }
+
+        private static bool InputAlreadyInList(string variable)
+        {
+            bool exists = false;
+            foreach (string inputVar in inputVariables)
+            {
+                if (inputVar == variable)
+                {
+                    exists = true;
+                }
+            }
+
+            return exists;
         }
 
         public static string DetermineOuterCommand(string line)
@@ -49,6 +131,7 @@ namespace LogicSim
             return line.Substring(0, openParenthesisIndex);
         }
 
+        /*
         public static int CountCommas(string line)
         {
             int count = 0;
@@ -62,6 +145,8 @@ namespace LogicSim
 
             return count;
         }
+        */
+
 
         /// <summary>
         /// Given a command, returns a new list of strings where each string is a command argument
@@ -72,7 +157,7 @@ namespace LogicSim
         public static List<string> GetCommandArgs(string line)
         {
             string innerCommandString = line.Substring(line.IndexOf('(')+1, line.LastIndexOf(')') - line.IndexOf('(')-1);
-            Console.WriteLine("Current inner command string: " + innerCommandString);
+            
             List<string> commandArgs = new List<string>();
 
             if (DetermineOuterCommand(line) == "NOT")
@@ -101,6 +186,7 @@ namespace LogicSim
         }
 
         
+        /*
         private static int DetermineNumParenthesisGroups(string line)
         {
             // should probably make sure equal number of opening and closing parenthesis 
@@ -116,6 +202,7 @@ namespace LogicSim
 
             return count;
         }
+        */
 
         private static int FindThisCommandsComma(string line)
         {
