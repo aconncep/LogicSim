@@ -25,15 +25,10 @@ namespace LogicSim
                 {
                     evalLine = TrimVariableAssignment(evalLine);
                     Console.WriteLine("Line being evaluated: " + evalLine);
-                    
 
-                    //Computer.initialCommand = DetermineOuterCommand(evalLine);
                     Console.WriteLine(Computer.ComputeCircuit(evalLine));
                 }
                 
-                
-                
-
             }
         }
         

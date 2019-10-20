@@ -14,7 +14,7 @@ namespace LogicSim
         /// <returns></returns>
         public static int ComputeCircuit(string currentCommand)
         {
-            // we're dealing with a hard-coded value
+            // we're dealing with a hard-coded value (base case)
             if (currentCommand == "0" || currentCommand == "1")
             {
                 return Convert.ToInt16(currentCommand);
@@ -35,10 +35,16 @@ namespace LogicSim
             {
                 case "AND":
                     return Commands.AND(ComputeCircuit(commandArgs[0]), ComputeCircuit(commandArgs[1]));
-                    break;
                 case "OR":
                     return Commands.OR(ComputeCircuit(commandArgs[0]), ComputeCircuit(commandArgs[1]));
-                    break;
+                case "NAND":
+                    return Commands.NAND(ComputeCircuit(commandArgs[0]), ComputeCircuit(commandArgs[1]));
+                case "NOR":
+                    return Commands.NOR(ComputeCircuit(commandArgs[0]), ComputeCircuit(commandArgs[1]));
+                case "XOR":
+                    return Commands.XOR(ComputeCircuit(commandArgs[0]), ComputeCircuit(commandArgs[1]));
+                case "XNOR":
+                    return Commands.XNOR(ComputeCircuit(commandArgs[0]), ComputeCircuit(commandArgs[1]));
                 default:
                     return 2;
             }

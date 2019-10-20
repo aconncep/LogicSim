@@ -2,7 +2,7 @@
 
 INPUTS A,B
 
-w1 = 1
+w1 = XOR(AND(OR(0,NOT(1)),NOT(0)),NOR(1,OR(NOT(1),1)))
 
 # Test commit for optimization branch, getting ready to wipe entire project :\
 OUTPUT w1,w2 # we don't need to mark input variables as output, but we can anyway
