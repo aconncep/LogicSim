@@ -25,14 +25,7 @@ namespace LogicSim
                 {
                     evalLine = TrimVariableAssignment(evalLine);
                     Console.WriteLine("Line being evaluated: " + evalLine);
-                    List<string> evalLineArgs = GetCommandArgs(evalLine);
                     
-                    int idx = 1;
-                    foreach (string arg in evalLineArgs)
-                    {
-                        Console.WriteLine("arg " + idx + ": " + arg);
-                        idx++;
-                    }
 
                     //Computer.initialCommand = DetermineOuterCommand(evalLine);
                     Console.WriteLine(Computer.ComputeCircuit(evalLine));
@@ -75,21 +68,40 @@ namespace LogicSim
             return count;
         }
 
+        /// <summary>
+        /// Given a command, returns a new list of strings where each string is a command argument
+        /// Ex. AND(OR(A,B),NAND(C,D)) returns OR(A,B) and NAND(C,D)
+        /// </summary>
+        /// <param name="line"></param>
+        /// <returns></returns>
         public static List<string> GetCommandArgs(string line)
         {
             string innerCommandString = line.Substring(line.IndexOf('(')+1, line.LastIndexOf(')') - line.IndexOf('(')-1);
             Console.WriteLine("Current inner command string: " + innerCommandString);
             List<string> commandArgs = new List<string>();
-            if (CountCommas(innerCommandString) == 1)
+
+            if (DetermineOuterCommand(line) == "NOT")
             {
-                commandArgs.Add(innerCommandString.Substring(0, innerCommandString.IndexOf(',')));
-                commandArgs.Add(innerCommandString.Substring(innerCommandString.IndexOf(',')+1, ((innerCommandString.Length-1) - commandArgs[0].Length)));
+                commandArgs.Add(innerCommandString);
+                return commandArgs;
+            }
+
+            if (innerCommandString == "0,0" || innerCommandString == "0,1" || innerCommandString == "1,0" || innerCommandString == "1,1")
+            {
+                foreach (char c in innerCommandString)
+                {
+                    if (c == 48 || c == 49) // 0 or 1
+                    {
+                        commandArgs.Add(c.ToString());
+                    }
+                }
             }
             else
             {
-                commandArgs.Add(innerCommandString.Substring(0,FindIndexOfFinalCompletedParenthesis(innerCommandString)));
-                commandArgs.Add(innerCommandString.Substring(FindIndexOfFinalCompletedParenthesis(innerCommandString)+1,innerCommandString.Length - commandArgs[0].Length-1));
+                commandArgs.Add(innerCommandString.Substring(0,FindThisCommandsComma(innerCommandString)));
+                commandArgs.Add(innerCommandString.Substring(FindThisCommandsComma(innerCommandString)+1,innerCommandString.Length - commandArgs[0].Length-1));
             }
+            
             return commandArgs;
         }
 
@@ -110,7 +122,7 @@ namespace LogicSim
             return count;
         }
 
-        private static int FindIndexOfFinalCompletedParenthesis(string line)
+        private static int FindThisCommandsComma(string line)
         {
             
             int firstParenthesisIdx = line.IndexOf('(') + 1;

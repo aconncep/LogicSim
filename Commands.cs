@@ -21,6 +21,16 @@ namespace LogicSim
 
             return 0;
         }
+
+        public static int NOT(int var1)
+        {
+            if (var1 == 1)
+            {
+                return 0;
+            }
+
+            return 1;
+        }
         
     }
 }

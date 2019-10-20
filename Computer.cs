@@ -6,47 +6,44 @@ namespace LogicSim
 {
     public class Computer
     {
-        //public static string initialCommand;
+        /// <summary>
+        /// Recursive function for computing a command string composed of multiple commands
+        /// Computes from the inside out and returns the output
+        /// </summary>
+        /// <param name="currentCommand"></param>
+        /// <returns></returns>
         public static int ComputeCircuit(string currentCommand)
         {
-            
-            
-            // base case 1
+            // we're dealing with a hard-coded value
             if (currentCommand == "0" || currentCommand == "1")
             {
                 return Convert.ToInt16(currentCommand);
             }
-            // base case 2
-            else if (Interpreter.CountCommas(currentCommand) == 1)
+            
+            List<string> commandArgs = Interpreter.GetCommandArgs(currentCommand);
+            
+
+            // this is a NOT command
+            if (commandArgs.Count == 1)
             {
-                List<string> commandArgs = Interpreter.GetCommandArgs(currentCommand);
-                
-                if (Interpreter.DetermineOuterCommand(currentCommand) == "AND")
-                {
-                    return Commands.AND(Convert.ToInt16(commandArgs[0]), Convert.ToInt16(commandArgs[1]));
-                }
-                else if (Interpreter.DetermineOuterCommand(currentCommand) == "OR")
-                {
-                    return Commands.OR(Convert.ToInt16(commandArgs[0]), Convert.ToInt16(commandArgs[1]));
-                }
+                return Commands.NOT(ComputeCircuit(commandArgs[0]));
             }
-            else if (Interpreter.CountCommas(currentCommand) > 1)
-            { 
-                List<string> commandArgs = Interpreter.GetCommandArgs(currentCommand);
-                    if (Interpreter.DetermineOuterCommand(currentCommand) == "AND")
-                    {
-                        return Commands.AND(ComputeCircuit(commandArgs[0]), ComputeCircuit(commandArgs[1]));
-                    }
-                    if (Interpreter.DetermineOuterCommand(currentCommand) == "OR")
-                    {
-                        return Commands.OR(ComputeCircuit(commandArgs[0]), ComputeCircuit(commandArgs[1]));
-                    }
-                    
-                
-
+            
+            // this is any other command (all of which requires two args)
+            string outerCommand = Interpreter.DetermineOuterCommand(currentCommand);
+            switch (outerCommand)
+            {
+                case "AND":
+                    return Commands.AND(ComputeCircuit(commandArgs[0]), ComputeCircuit(commandArgs[1]));
+                    break;
+                case "OR":
+                    return Commands.OR(ComputeCircuit(commandArgs[0]), ComputeCircuit(commandArgs[1]));
+                    break;
+                default:
+                    return 2;
             }
-
-            return 9999;
+            
+            
         }
     }
 }
