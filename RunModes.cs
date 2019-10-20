@@ -12,12 +12,35 @@ namespace LogicSim
         public static void RunAuto(bool verbose, string[] fileLines)
         {
             Console.WriteLine("Running in auto, verbose is " + verbose);
-            Interpreter.Interpret(fileLines);
+            try
+            {
+                Interpreter.Interpret(fileLines);
+            }
+            catch (InterpreterException e)
+            {
+                Console.WriteLine(e.Message);
+            }
+            catch (SystemException e)
+            {
+                Console.WriteLine("Something went wrong. Check your HDL file and try again.");
+            }
         }
 
         public static void RunManual(bool verbose, string[] fileLines)
         {
             Console.WriteLine("Running in manual, verbose is " + verbose);
+            try
+            {
+                Interpreter.Interpret(fileLines);
+            }
+            catch (InterpreterException e)
+            {
+                Console.WriteLine(e.Message);
+            }
+            catch (SystemException e)
+            {
+                Console.WriteLine("Something went wrong. Check your HDL file and try again.");
+            }
         }
     }
 }

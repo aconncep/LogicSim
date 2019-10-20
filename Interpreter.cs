@@ -7,8 +7,14 @@ namespace LogicSim
     {
         private static int currentLine = 0;
         private static List<string> inputVariables = new List<string>();
+        private static List<string> outputVariables = new List<string>();
+
+
         public static void Interpret(string[] fileLines)
         {
+            
+            CheckForMissingLines(fileLines);
+            
             foreach (string line in fileLines)
             {
                 currentLine++;
@@ -25,18 +31,23 @@ namespace LogicSim
                     continue;
                 }
 
-                if (LineStartsWithINPUTS(evalLine))
+                evalLine = RemoveInlineComments(evalLine);
+
+                if (evalLine.StartsWith("INPUTS ", StringComparison.CurrentCultureIgnoreCase))
                 {
+                    
                     string variablesStr = evalLine.Substring(7, evalLine.Length - 7);
-                    Console.WriteLine(variablesStr);
-                    try
-                    {
-                        inputVariables = SplitInputsStringUp(variablesStr);
-                    }
-                    catch (InputVariableException e)
-                    {
-                        Console.WriteLine(e.Message);
-                    }
+                    
+                    inputVariables = SplitInputsStringUp(variablesStr);
+                    
+                }
+                
+                if (evalLine.StartsWith("OUTPUT ", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    
+                    string variablesStr = evalLine.Substring(7, evalLine.Length - 7);
+                    
+                    outputVariables = SplitOutputsStringUp(variablesStr);
                     
                 }
 
@@ -48,6 +59,36 @@ namespace LogicSim
                 }
                 
             }
+            
+        }
+
+        private static void CheckForMissingLines(string[] fileLines)
+        {
+            bool hasINPUTS = false;
+            bool hasOUTPUT = false;
+            
+            foreach (string line in fileLines)
+            {
+                if (line.Trim().StartsWith("INPUTS ", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    hasINPUTS = true;
+                }
+                if (line.Trim().StartsWith("OUTPUT ", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    hasOUTPUT = true;
+                }
+            }
+            
+            if (hasINPUTS == false)
+            {
+                throw new MissingINPUTSException();
+            }
+
+            if (hasOUTPUT == false)
+            {
+                throw new MissingOUTPUTException();
+            }
+
         }
         
         private static bool LineStartsWithPound(string line)
@@ -55,10 +96,21 @@ namespace LogicSim
             return line[0].ToString() == "#";
         }
 
-        private static bool LineStartsWithINPUTS(string line)
+        private static string RemoveInlineComments(string line)
         {
-            return line.StartsWith("INPUTS ", StringComparison.CurrentCultureIgnoreCase);
+            if (line.Contains('#'))
+            {
+                line = line.Substring(0, line.IndexOf('#'));
+                if (line.EndsWith(' '))
+                {
+                    line = line.Substring(0, line.Length - 1);
+                    return line;
+                }
+                return line;
+            }
+            return line;
         }
+        
 
         private static string TrimVariableAssignment(string line)
         {
@@ -110,6 +162,51 @@ namespace LogicSim
 
             return inputVariables;
         }
+        private static List<string> SplitOutputsStringUp(string outputString)
+        {
+            string thisVar = "";
+
+            int idx = 0;
+            
+            foreach (char c in outputString)
+            {
+                if (c != 44) // if the character is not a comma
+                {
+                    thisVar += c;
+                    if (idx == outputString.Length - 1)
+                    {
+                        if (!OutputAlreadyInList(thisVar))
+                        {
+                            outputVariables.Add(thisVar);
+                            thisVar = "";
+                        }
+                        else
+                        {
+                            throw new OutputVariableException(currentLine, thisVar);
+                        }
+                        
+                    }
+                }
+                else
+                {
+                    if (!OutputAlreadyInList(thisVar))
+                    {
+                        outputVariables.Add(thisVar);
+                        thisVar = "";
+                    }
+                    else
+                    {
+                        throw new OutputVariableException(currentLine, thisVar);
+                    }
+                }
+
+                idx++;
+
+            }
+
+            return outputVariables;
+        }
+
 
         private static bool InputAlreadyInList(string variable)
         {
@@ -117,6 +214,20 @@ namespace LogicSim
             foreach (string inputVar in inputVariables)
             {
                 if (inputVar == variable)
+                {
+                    exists = true;
+                }
+            }
+
+            return exists;
+        }
+        
+        private static bool OutputAlreadyInList(string variable)
+        {
+            bool exists = false;
+            foreach (string outputVar in outputVariables)
+            {
+                if (outputVar == variable)
                 {
                     exists = true;
                 }
