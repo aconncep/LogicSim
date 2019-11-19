@@ -1,101 +1,67 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Windows.Input;
-using LogicSim.Commands;
 
 namespace LogicSim
 {
-    /// <summary>
-    /// This class is responsible for computing the variable value of every local variable in the circuit
-    /// given an array of input variables with pre-set values
-    /// </summary>
     public class Computer
     {
-        readonly Dictionary<Variable, Command> localVariables;
-        readonly List<Variable> inputVariables; 
-        List<Variable> allArgVars = new List<Variable>();
-
-        public Computer(FileData fd)
+        /// <summary>
+        /// Recursive function for computing a command string composed of multiple commands
+        /// Computes from the inside out and returns the output
+        /// </summary>
+        /// <param name="currentCommand"></param>
+        /// <returns></returns>
+        public static int ComputeCircuit(string currentCommand)
         {
-            localVariables = fd.localVariables;
-            inputVariables = fd.inputVariables;
-        }
+            // we're dealing with a hard-coded value (base case)
+            if (currentCommand == "0" || currentCommand == "1")
+            {
+                return Convert.ToInt16(currentCommand);
+            }
 
-        public List<Variable> ComputeCircuit()
-        {
-            InitAllArgVars();
-            InitAllInputVars();
-            ComputeLocalVars();
+            Variable inputV = Interpreter.GetInputVariableWithName(currentCommand);
+            Variable localV = Interpreter.GetLocalVariableWithName(currentCommand);
+            if (inputV != null)
+            {
+                return inputV.value;
+            }
+
+            if (localV != null)
+            {
+                return localV.value;
+            }
             
-            // Create a list of every variables in it's final form
-            List<Variable> allVariablesOutput = new List<Variable>();
-            foreach (Variable var in inputVariables)
-            {
-                allVariablesOutput.Add(var);
-            }
-            foreach (Variable var in localVariables.Keys)
-            {
-                allVariablesOutput.Add(var);
-            }
-            return allVariablesOutput;
+            
+            List<string> commandArgs = Interpreter.GetCommandArgs(currentCommand);
+            
 
-        }
-        
-        
-        
-        // fill allArgVars list with all the variables found in command arguments
-        private void InitAllArgVars()
-        {
-            foreach (Command command in localVariables.Values)
+            // this is a NOT command
+            if (commandArgs.Count == 1)
             {
-                foreach (Variable var in command.Variables)
-                {
-                    allArgVars.Add(var);
-                }
-                
+                return Commands.NOT(ComputeCircuit(commandArgs[0]));
             }
-        }
-
-        // set the value of any allArgVars variable that is an input (A,B,C...)
-        private void InitAllInputVars()
-        {
-            foreach (Variable var in allArgVars)
+            
+            // this is any other command (all of which requires two args)
+            string outerCommand = Interpreter.DetermineOuterCommand(currentCommand);
+            switch (outerCommand)
             {
-                foreach (Variable inputVar in inputVariables)
-                {
-                    if (var.Equals(inputVar))
-                    {
-                        var.SetValue(inputVar.value);
-                    }
-                }
-                
+                case "AND":
+                    return Commands.AND(ComputeCircuit(commandArgs[0]), ComputeCircuit(commandArgs[1]));
+                case "OR":
+                    return Commands.OR(ComputeCircuit(commandArgs[0]), ComputeCircuit(commandArgs[1]));
+                case "NAND":
+                    return Commands.NAND(ComputeCircuit(commandArgs[0]), ComputeCircuit(commandArgs[1]));
+                case "NOR":
+                    return Commands.NOR(ComputeCircuit(commandArgs[0]), ComputeCircuit(commandArgs[1]));
+                case "XOR":
+                    return Commands.XOR(ComputeCircuit(commandArgs[0]), ComputeCircuit(commandArgs[1]));
+                case "XNOR":
+                    return Commands.XNOR(ComputeCircuit(commandArgs[0]), ComputeCircuit(commandArgs[1]));
+                default:
+                    return 2;
             }
-        }
-        
-        // compute the value of each local variable (w1,w2,w3...)
-        private void ComputeLocalVars() 
-        {
-            foreach (Variable var in localVariables.Keys)
-            {
-                // try to get the associated command with each value
-                if (localVariables.TryGetValue(var, out Command command))
-                {
-                    var.SetValue(command.Evaluate());
-                    
-                    // if this command contains the local var we're working with, update it's value
-                    foreach (var a in allArgVars)
-                    {
-                        if (a.Equals(var))
-                        {
-                            a.SetValue(var.value);
-                        }
-                    }
-  
-                }        
-            }      
+            
+            
         }
     }
 }

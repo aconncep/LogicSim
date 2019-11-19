@@ -6,195 +6,152 @@ namespace LogicSim
 {
     class Program
     {
+        private static string[] FileLines { get; set; }
         static void Main(string[] args)
         {
-            if (args.Length == 3)
+            Console.WriteLine("LogicSim v2.0 by Austin Cepalia");
+            
+            // Try to open the file to make sure it exists
+            try
             {
-                FileReader reader = null;
-                try
-                {
-                    reader = new FileReader(args[0]);  
-                }
-                catch (FileNotFoundException)
-                {
-                    Console.WriteLine("Error: File not found");
-                    Environment.Exit(1);
-                }
+                FileLines = File.ReadAllLines(args[0]);
+            }
+            catch (FileNotFoundException)
+            {
+                Console.WriteLine("Unable to open file " + args[0]);
+                Environment.Exit(1);
+            } 
 
-                FileData fileData = null;
-
-                try
-                {
-                    fileData = reader.GenerateFileData();
-                }
-                catch (CompilationException e)
-                {
-                    Console.WriteLine(e.Message);
-                    Environment.Exit(1);
-                }
-
-                if (String.Equals(args[1], "auto", StringComparison.Ordinal))
-                {
-                    if (String.Equals(args[2], "verbose", StringComparison.Ordinal))
-                    {
-                        RunAuto(fileData, true);
-                    }
-                    else if (String.Equals(args[2], "simple", StringComparison.Ordinal))
-                    {
-                        RunAuto(fileData, false);
-                    }
-                    else
-                    {
-                        Console.WriteLine("Usage: LogicSim [path_to_file] [auto/manual] [verbose/simple]");
-                    }
-
-
-                }
-                else if (String.Equals(args[1], "manual", StringComparison.Ordinal))
-                {
-                    if (String.Equals(args[2], "verbose", StringComparison.Ordinal))
-                    {
-                        RunManual(fileData);
-                    }
-                    else if (String.Equals(args[2], "simple", StringComparison.Ordinal))
-                    {
-                        Console.WriteLine("Manual simple mode is not supported. Using manual verbose instead...");
-                        RunManual(fileData);
-                    }
-                    else
-                    {
-                        Console.WriteLine("Usage: LogicSim [path_to_file] [auto/manual] [verbose/simple]");
-                    }
-                }
-                else
-                {
-                    Console.WriteLine("Usage: LogicSim [path_to_file] [auto/manual] [verbose/simple]");
-                }
+            // if the wrong number of arguments are provided, ask user for them in console
+            if (args.Length != 3)
+            {
+                RunWithoutArgs();
             }
             else
             {
-                Console.WriteLine("Usage: LogicSim [path_to_file] [auto/manual] [verbose/simple]");
-            }
-        }
-
-        static void RunManual(FileData fileData)
-        {
-            while (true)
-            {
-                int currentVariableIdx = 0;
-
-                while (currentVariableIdx < fileData.inputVariables.Count)
+                // Determine the run configuration
+                if (!CompareArgStrings(args[1], "auto") &&
+                        !CompareArgStrings(args[1], "manual") &&
+                        !CompareArgStrings(args[2], "simple") &&
+                        !CompareArgStrings(args[2], "verbose"))
                 {
-                    Console.Write("Enter value for input variable " + fileData.inputVariables[currentVariableIdx].name +
-                                  " [or x to quit]:  ");
-                    char userInput = Console.ReadKey().KeyChar;
-                    if (userInput.Equals('x'))
-                    {
-                        Console.WriteLine();
-                        Console.WriteLine("Exiting...");
-                        Environment.Exit(0);
-                    }
-                    else if (!userInput.Equals('0') && !userInput.Equals('1'))
-                    {
-                        Console.WriteLine();
-                        Console.WriteLine("Invalid input!");
-                        continue;
-                    }
-
-                    fileData.inputVariables[currentVariableIdx].SetValue(userInput - 48);
-                    currentVariableIdx++;
-                    Console.WriteLine();
+                    RunWithoutArgs();
                 }
-
-                Console.WriteLine();
-                ComputeAndDisplay(fileData, true);
-                Console.WriteLine();
-            }
-        }
-
-        static void RunAuto(FileData fileData, bool verbose)
-        {
-            Console.WriteLine("Simulating circuit...");
-            int numInputs = fileData.inputVariables.Count;
-
-            if (!verbose)
-            {
-                foreach (Variable var in fileData.inputVariables)
+                else if (CompareArgStrings(args[1], "auto") &&
+                         CompareArgStrings(args[2], "simple"))
                 {
-                    Console.Write(var.name + " ");
+                    RunModes.RunAuto(false, FileLines);
                 }
-                Console.Write(" | ");
-                
-                foreach (var var in fileData.localVariables)
+                else if (CompareArgStrings(args[1], "auto") &&
+                         CompareArgStrings(args[2], "verbose"))
                 {
-                    if (var.Key.shouldOutput)
-                    {
-                        Console.Write(var.Key.name + " ");
-                    }
+                    RunModes.RunAuto(true, FileLines);
                 }
-
-                Console.WriteLine();
-            }
-            
-            for (int i = 0; i < Math.Pow(2, numInputs); i++)
-            {
-                string binaryStr = Convert.ToString(i, 2).PadLeft(numInputs, '0');
-
-                int idx = 0;
-                foreach (char c in binaryStr)
+                else if (CompareArgStrings(args[1], "manual") &&
+                         CompareArgStrings(args[2], "simple"))
                 {
-                    fileData.inputVariables[idx].SetValue((int)Char.GetNumericValue(c));
-                    idx++;
+                    Console.WriteLine("Manual simple mode is not supported. Running manual verbose instead...");
+                    RunModes.RunManual(false, FileLines);
                 }
-
-                if (verbose)
+                else if (CompareArgStrings(args[1], "manual") &&
+                         CompareArgStrings(args[2], "verbose"))
                 {
-                    Console.WriteLine();
-
-                    Console.Write("Current input variables: ");
-                    foreach (Variable var in fileData.inputVariables)
-                    {
-                        Console.Write(var.name + ": " + var.value + "   ");
-
-                    }
-                    Console.WriteLine();
-                    ComputeAndDisplay(fileData, verbose);
-                    Console.WriteLine();
+                    RunModes.RunManual(true, FileLines);
                 }
                 else
                 {
-                    foreach (Variable var in fileData.inputVariables)
-                    {
-                        Console.Write(var.value + " ");
-                    }
-                    Console.Write(" | ");
-                    ComputeAndDisplay(fileData, verbose);
-                    Console.WriteLine();
-                }  
-                
-            }
-            
-        }
-
-        static void ComputeAndDisplay(FileData fileData, bool verbose)
-        {
-            Computer computer = new Computer(fileData);
-            List<Variable> simOutput = computer.ComputeCircuit();
-
-            foreach (Variable var in simOutput)
-            {
-                if (var.shouldOutput)
-                {
-                    if (verbose)
-                    {
-                        Console.Write("Output variable " + var.name + ": " + var.value + "  ");
-                    }
-                    else
-                    {
-                        Console.Write(var.value + "  ");
-                    }
+                    RunWithoutArgs();
                 }
             }
         }
+
+        /// <summary>
+        /// If the wrong number of arguments is supplied or an invalid argument is specified
+        /// This is like the fail-safe, but it still requires a valid file
+        /// </summary>
+        static void RunWithoutArgs()
+        {
+            if (FileLines == null)
+            {
+                Console.WriteLine("Usage: LogicSim [path_to_file] [auto/manual] [verbose/simple]");
+                Environment.Exit(1);
+            }
+
+            // array of RunLabels to store user inputs
+            RunLabel[] selections = new RunLabel[2];
+
+            while (true)
+            {
+                Console.WriteLine("Select a run mode:");
+                Console.WriteLine("1. Auto");
+                Console.WriteLine("2. Manual");
+
+                char userIn = Console.ReadKey().KeyChar;
+                Console.WriteLine();
+                
+                if (userIn == '1')
+                {
+                    selections[0] = RunLabel.AUTO;
+                    break;
+                }
+                else if (userIn == '2')
+                {
+                    selections[0] = RunLabel.MANUAL;
+                    break;
+                }
+
+                Console.WriteLine("Invalid input. Try again.");
+                Console.WriteLine();
+            }
+
+            if (selections[0] == RunLabel.AUTO)
+            {
+                while (true)
+                {
+                    Console.WriteLine("Select a verbosity mode:");
+                    Console.WriteLine("1. Verbose");
+                    Console.WriteLine("2. Simple");
+                    
+                    char userIn = Console.ReadKey().KeyChar;
+                    Console.WriteLine();
+                    
+                    if (userIn == '1')
+                    {
+                        selections[1] = RunLabel.VERBOSE;
+                        break;
+                    }
+                    else if (userIn == '2')
+                    {
+                        selections[1] = RunLabel.SIMPLE;
+                        break;
+                    }
+
+                    Console.WriteLine("Invalid input. Try again.");
+                    Console.WriteLine();
+                }
+            }
+            else // we must use manual verbose, manual simple is not possible
+            {
+                RunModes.RunManual(true, FileLines);
+            }
+
+            // determine the run mode from the entered selections
+            if (selections[0] == RunLabel.AUTO && selections[1] == RunLabel.SIMPLE)
+            {
+                RunModes.RunAuto(false, FileLines);
+            }
+            else if (selections[0] == RunLabel.AUTO && selections[1] == RunLabel.VERBOSE)
+            {
+                RunModes.RunAuto(true, FileLines);
+            }
+        }
+
+        static bool CompareArgStrings(string str1, string str2)
+        {
+            return string.Equals(str1, str2, StringComparison.OrdinalIgnoreCase);
+        }
+        
+        
+
     }
 }

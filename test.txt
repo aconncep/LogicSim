@@ -1,10 +1,8 @@
 ﻿# Test program
 
-INPUTS A,B
+INPUTS A,B,C
 
-w1 = AND(A,B)
-w2 = NOT(w1) 
-w3 = NAND(w2,B)
+w1 = XOR(AND(OR(0,NOT(A)),NOT(A)),NOR(A,OR(NOT(C),A)))
+#w1 = AND(A,B)
+w2 = OR(C,w1)
 
-#testing something
-OUTPUT w1,w2 # we don't need to mark input variables as output, but we can anyway
