@@ -6,4 +6,3 @@ w1 = XOR(AND(OR(0,NOT(A)),NOT(A)),NOR(A,OR(NOT(C),A)))
 #w1 = AND(A,B)
 w2 = OR(C,w1)
 
-OUTPUT w1,penis,dick,w2
