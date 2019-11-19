@@ -18,7 +18,7 @@ LogicSim [path_to_file] [auto/manual] [verbose/simple]
 
 - *Manual*: In this mode, the user enters a binary value for each input manually, and then the software simulates the circuit with those inputs and displays the output. This runs indefinitely until the user quits with 'x'.
 
-- The software also supports a simplified or verbose output, which is achieved by inputting [*simple/verbose*] for the last program argument. Simple mode draws a table for the output, whereas verbose mode includes information about the variable types (input/local). Manual simple mode is not supported - the software will automatically switch to manual verbose instead.
+- The software also supports a simplified or verbose output, which is achieved by inputting [*simple/verbose*] for the last program argument. Simple mode draws a table for the output, whereas verbose mode includes information about the variable types (input/output). Manual simple mode is not supported - the software will automatically switch to manual verbose instead.
 
 # HDL File
 The Hardware Design Language (HDL) file is simply a text file that contains the instructions LogicSim uses to interpret the circuit. It supports seven logic operations:
@@ -35,9 +35,7 @@ Each operation is called a command and is called as if it were a function. Every
 
 Each file requires the presence of an INPUTS and an OUTPUT line (LogicSim will warn you if one is missing). INPUTS defines the input variables, and OUTPUT defines the variables that should be displayed as output. Comments are also supported with #, either on their own line or inline (like Python).
 
-As of right now, each command must be written on it's own line, and each output must be stored in a new variable. These are called local variables. Eventually the underlying system will be re-written to support commands being used as other command arguments rather than requiring a variable.
-
-LogicSim checks your HDL file before processing anything. It will warn you about some syntax errors, unused variables, and unknown variables, including the line number that contains the error. It's not perfect, but it can identify most issues.
+The program now supports commands nested within one another. For example, `AND(NOR(1,0),XOR(0,1))`. You can also store the output of each command in a new variable (one per line).
 
 # Example Usage
 
