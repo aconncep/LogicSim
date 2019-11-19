@@ -6,60 +6,290 @@ namespace LogicSim
     public static class Interpreter
     {
         private static int currentLine = 0;
-        private static List<string> inputVariables = new List<string>();
-        private static List<string> outputVariables = new List<string>();
-
-
-        public static void Interpret(string[] fileLines)
+        private static List<Variable> inputVariables = new List<Variable>();
+        private static List<Variable> localVariables = new List<Variable>();
+        private static List<Variable> outputVariables = new List<Variable>();
+        
+        private static void SetInputVariableValues(string binaryStr)
         {
+            int varIdx = 0;
+            foreach (char c in binaryStr)
+            {
+                inputVariables[varIdx].value = (int)Char.GetNumericValue(c);
+                varIdx++;
+            }
             
+        }
+        public static Variable GetInputVariableWithName(string name)
+        {
+            foreach (Variable var in inputVariables)
+            {
+                if (var.name == name)
+                {
+                    return var;
+                }
+            }
+            return null;
+        }
+        
+        public static Variable GetLocalVariableWithName(string name)
+        {
+            foreach (Variable var in localVariables)
+            {
+                if (var.name == name)
+                {
+                    return var;
+                }
+            }
+            return null;
+        }
+
+        public static void Interpret(string[] fileLines, bool auto, bool verbose)
+        {
             CheckForMissingLines(fileLines);
-            
+
+            DetectInputVariables(fileLines);
+            DetectOutputVariables(fileLines);
+
+
+            bool printed = false;
+            if (auto)
+            {
+                // each pass through the whole file with new inputs
+                for (int i = 0; i < Math.Pow(2, inputVariables.Count); i++)
+                {
+                    string binaryStr = Convert.ToString(i, 2).PadLeft(inputVariables.Count, '0');
+                    
+
+                    SetInputVariableValues(binaryStr);
+                    
+                    if (verbose)
+                    {
+                        Console.WriteLine("Current input variables: ");
+                        foreach (Variable inputV in inputVariables)
+                        {
+                            Console.Write(inputV.name + ": " + inputV.value + "  ");
+                        }
+                        Console.WriteLine();
+                    }
+                    
+                    
+                    foreach (string line in fileLines)
+                    {
+                        currentLine++;
+                
+                        string evalLine = line.Trim();
+
+                        if (evalLine.Length == 0)
+                        {
+                            continue;
+                        }                
+                
+                        if (LineStartsWithPound(evalLine))
+                        {
+                            continue;
+                        }
+
+                        evalLine = RemoveInlineComments(evalLine);
+
+                        if (evalLine.Contains('='))
+                        {
+                            string variableName = evalLine.Substring(0, evalLine.IndexOf('=')-1);
+                    
+                            evalLine = TrimVariableAssignment(evalLine);
+
+                            localVariables.Add(new Variable(variableName, Computer.ComputeCircuit(evalLine)));
+                        }
+                    }
+
+                    if (!printed)
+                    {
+                        if (!verbose)
+                        {
+                            foreach (Variable inputV in inputVariables)
+                            {
+                                Console.Write(inputV.name + " ");
+                            }
+                            Console.Write("| ");
+                            foreach (Variable outputV in outputVariables)
+                            {
+                                if (localVariables.Contains(outputV))
+                                {
+                                    Console.Write(outputV.name + " ");
+                                }
+                            }
+                            Console.WriteLine();
+                        }
+
+                        printed = true;
+                    }
+
+                    if (verbose)
+                    {
+                        foreach (Variable localV in localVariables)
+                        {
+                            if (outputVariables.Contains(localV))
+                            {
+                                Console.WriteLine("Output variable " + localV.name + " with value " + localV.value);
+                            }
+
+                            
+                        } 
+                        Console.WriteLine();
+                    }
+                    else
+                    {
+                        foreach (Variable inputV in inputVariables)
+                        {
+                            Console.Write(inputV.value + " ");
+                        }
+                        Console.Write("| ");
+                        foreach (Variable localV in localVariables)
+                        {
+                            if (outputVariables.Contains(localV))
+                            {
+                                Console.Write(localV.value + " ");
+                            }
+
+                        }
+                        Console.WriteLine();
+                    }
+
+                    localVariables.Clear();
+                }
+                
+                
+            }
+            else
+            {
+                while (true)
+                {
+                    string userBitString = "";
+                    foreach (Variable inputV in inputVariables)
+                    {
+                        while (true)
+                        {
+                            Console.Write("Enter value for variable " + inputV.name + " [or x to quit]:  ");
+                            char userIn = Console.ReadKey().KeyChar;
+                            Console.WriteLine();
+                            if (userIn == 'x' || userIn == 'X')
+                            {
+                                Environment.Exit(0);
+                            }
+                            if (userIn != '0' && userIn != '1')
+                            {
+                                Console.WriteLine("Invalid input");
+                                continue;
+                            }
+                            userBitString += userIn;
+                            break;
+                        }
+                    }
+                SetInputVariableValues(userBitString);
+
+                foreach (string line in fileLines)
+                {
+                    currentLine++;
+
+                    string evalLine = line.Trim();
+
+                    if (evalLine.Length == 0)
+                    {
+                        continue;
+                    }
+
+                    if (LineStartsWithPound(evalLine))
+                    {
+                        continue;
+                    }
+
+                    evalLine = RemoveInlineComments(evalLine);
+
+                    if (evalLine.Contains('='))
+                    {
+                        string variableName = evalLine.Substring(0, evalLine.IndexOf('=') - 1);
+
+                        evalLine = TrimVariableAssignment(evalLine);
+
+                        localVariables.Add(new Variable(variableName, Computer.ComputeCircuit(evalLine)));
+                    }
+                }
+                
+                foreach (Variable localV in localVariables)
+                {
+                    if (outputVariables.Contains(localV))
+                    {
+                        Console.WriteLine("Output variable " + localV.name + " with value " + localV.value);
+                    }
+
+                            
+                } 
+                Console.WriteLine();
+                localVariables.Clear();
+
+                }
+                
+            }
+        }
+        
+        private static void DetectInputVariables(string[] fileLines)
+        {
             foreach (string line in fileLines)
             {
                 currentLine++;
-                
+
                 string evalLine = line.Trim();
 
                 if (evalLine.Length == 0)
                 {
                     continue;
-                }                
-                
+                }
+
                 if (LineStartsWithPound(evalLine))
                 {
                     continue;
                 }
 
                 evalLine = RemoveInlineComments(evalLine);
-
                 if (evalLine.StartsWith("INPUTS ", StringComparison.CurrentCultureIgnoreCase))
                 {
-                    
+
                     string variablesStr = evalLine.Substring(7, evalLine.Length - 7);
-                    
-                    inputVariables = SplitInputsStringUp(variablesStr);
-                    
+
+                    inputVariables = BuildInputVariables(variablesStr);
+
                 }
-                
+            }
+        }
+        
+        private static void DetectOutputVariables(string[] fileLines)
+        {
+            foreach (string line in fileLines)
+            {
+                currentLine++;
+
+                string evalLine = line.Trim();
+
+                if (evalLine.Length == 0)
+                {
+                    continue;
+                }
+
+                if (LineStartsWithPound(evalLine))
+                {
+                    continue;
+                }
+
+                evalLine = RemoveInlineComments(evalLine);
                 if (evalLine.StartsWith("OUTPUT ", StringComparison.CurrentCultureIgnoreCase))
                 {
-                    
+
                     string variablesStr = evalLine.Substring(7, evalLine.Length - 7);
-                    
-                    outputVariables = SplitOutputsStringUp(variablesStr);
-                    
-                }
 
-                if (evalLine.Contains('='))
-                {
-                    evalLine = TrimVariableAssignment(evalLine);
+                    outputVariables = BuildOutputVariables(variablesStr);
 
-                    int returnValue = Computer.ComputeCircuit(evalLine);
                 }
-                
             }
-            
         }
 
         private static void CheckForMissingLines(string[] fileLines)
@@ -118,7 +348,7 @@ namespace LogicSim
             return line.Substring(equalsIndex+1, (line.Length-1)-equalsIndex).Trim();
         }
 
-        private static List<string> SplitInputsStringUp(string inputString)
+        private static List<Variable> BuildInputVariables(string inputString)
         {
             string thisVar = "";
 
@@ -133,7 +363,7 @@ namespace LogicSim
                     {
                         if (!InputAlreadyInList(thisVar))
                         {
-                            inputVariables.Add(thisVar);
+                            inputVariables.Add(new Variable(thisVar, 0));
                             thisVar = "";
                         }
                         else
@@ -147,7 +377,7 @@ namespace LogicSim
                 {
                     if (!InputAlreadyInList(thisVar))
                     {
-                        inputVariables.Add(thisVar);
+                        inputVariables.Add(new Variable(thisVar, 0));
                         thisVar = "";
                     }
                     else
@@ -162,22 +392,23 @@ namespace LogicSim
 
             return inputVariables;
         }
-        private static List<string> SplitOutputsStringUp(string outputString)
+        
+        private static List<Variable> BuildOutputVariables(string inputString)
         {
             string thisVar = "";
 
             int idx = 0;
             
-            foreach (char c in outputString)
+            foreach (char c in inputString)
             {
                 if (c != 44) // if the character is not a comma
                 {
                     thisVar += c;
-                    if (idx == outputString.Length - 1)
+                    if (idx == inputString.Length - 1)
                     {
                         if (!OutputAlreadyInList(thisVar))
                         {
-                            outputVariables.Add(thisVar);
+                            outputVariables.Add(new Variable(thisVar, 0));
                             thisVar = "";
                         }
                         else
@@ -191,7 +422,7 @@ namespace LogicSim
                 {
                     if (!OutputAlreadyInList(thisVar))
                     {
-                        outputVariables.Add(thisVar);
+                        outputVariables.Add(new Variable(thisVar, 0));
                         thisVar = "";
                     }
                     else
@@ -207,13 +438,12 @@ namespace LogicSim
             return outputVariables;
         }
 
-
         private static bool InputAlreadyInList(string variable)
         {
             bool exists = false;
-            foreach (string inputVar in inputVariables)
+            foreach (Variable inputVar in inputVariables)
             {
-                if (inputVar == variable)
+                if (inputVar.name == variable)
                 {
                     exists = true;
                 }
@@ -221,13 +451,13 @@ namespace LogicSim
 
             return exists;
         }
-        
+
         private static bool OutputAlreadyInList(string variable)
         {
             bool exists = false;
-            foreach (string outputVar in outputVariables)
+            foreach (Variable outputVar in outputVariables)
             {
-                if (outputVar == variable)
+                if (outputVar.name == variable)
                 {
                     exists = true;
                 }
@@ -241,24 +471,7 @@ namespace LogicSim
             int openParenthesisIndex = line.IndexOf('(');
             return line.Substring(0, openParenthesisIndex);
         }
-
-        /*
-        public static int CountCommas(string line)
-        {
-            int count = 0;
-            foreach (char c in line)
-            {
-                if (c == ',')
-                {
-                    count++;
-                }
-            }
-
-            return count;
-        }
-        */
-
-
+        
         /// <summary>
         /// Given a command, returns a new list of strings where each string is a command argument
         /// Ex. AND(OR(A,B),NAND(C,D)) returns OR(A,B) and NAND(C,D)
@@ -276,7 +489,7 @@ namespace LogicSim
                 commandArgs.Add(innerCommandString);
                 return commandArgs;
             }
-
+            
             if (innerCommandString == "0,0" || innerCommandString == "0,1" || innerCommandString == "1,0" || innerCommandString == "1,1")
             {
                 foreach (char c in innerCommandString)
@@ -287,6 +500,35 @@ namespace LogicSim
                     }
                 }
             }
+
+
+            if (!innerCommandString.Contains('('))
+            {
+                string[] innerCommandSplit = innerCommandString.Split(',');
+                foreach (string c in innerCommandSplit)
+                {
+                    if (c == "1")
+                    {
+                        commandArgs.Add("1");
+                    }
+
+                    if (c == "0")
+                    {
+                        commandArgs.Add("0");
+                    }
+                    Variable inputVar = GetInputVariableWithName(c);
+                    Variable localVar = GetLocalVariableWithName(c);
+                    if (inputVar != null)
+                    {
+                        commandArgs.Add(inputVar.name);
+                    }
+                    if (localVar != null)
+                    {
+                        commandArgs.Add(localVar.name);
+                    }
+                }
+            }
+            
             else
             {
                 commandArgs.Add(innerCommandString.Substring(0,FindThisCommandsComma(innerCommandString)));
@@ -295,26 +537,6 @@ namespace LogicSim
             
             return commandArgs;
         }
-
-        
-        /*
-        private static int DetermineNumParenthesisGroups(string line)
-        {
-            // should probably make sure equal number of opening and closing parenthesis 
-            
-            int count = 0;
-            foreach (char c in line)
-            {
-                if (c == '(')
-                {
-                    count++;
-                }
-            }
-
-            return count;
-        }
-        */
-
         private static int FindThisCommandsComma(string line)
         {
             

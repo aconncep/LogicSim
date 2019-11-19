@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Microsoft.VisualBasic.CompilerServices;
 
 namespace LogicSim
 {
@@ -19,6 +18,19 @@ namespace LogicSim
             {
                 return Convert.ToInt16(currentCommand);
             }
+
+            Variable inputV = Interpreter.GetInputVariableWithName(currentCommand);
+            Variable localV = Interpreter.GetLocalVariableWithName(currentCommand);
+            if (inputV != null)
+            {
+                return inputV.value;
+            }
+
+            if (localV != null)
+            {
+                return localV.value;
+            }
+            
             
             List<string> commandArgs = Interpreter.GetCommandArgs(currentCommand);
             

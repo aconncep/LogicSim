@@ -14,7 +14,7 @@ namespace LogicSim
             Console.WriteLine("Running in auto, verbose is " + verbose);
             try
             {
-                Interpreter.Interpret(fileLines);
+                Interpreter.Interpret(fileLines, true, verbose);
             }
             catch (InterpreterException e)
             {
@@ -31,7 +31,7 @@ namespace LogicSim
             Console.WriteLine("Running in manual, verbose is " + verbose);
             try
             {
-                Interpreter.Interpret(fileLines);
+                Interpreter.Interpret(fileLines, false, verbose);
             }
             catch (InterpreterException e)
             {

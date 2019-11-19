@@ -51,7 +51,7 @@ namespace LogicSim
                          CompareArgStrings(args[2], "simple"))
                 {
                     Console.WriteLine("Manual simple mode is not supported. Running manual verbose instead...");
-                    RunModes.RunManual(true, FileLines);
+                    RunModes.RunManual(false, FileLines);
                 }
                 else if (CompareArgStrings(args[1], "manual") &&
                          CompareArgStrings(args[2], "verbose"))
