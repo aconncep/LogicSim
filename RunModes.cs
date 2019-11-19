@@ -12,6 +12,7 @@ namespace LogicSim
         public static void RunAuto(bool verbose, string[] fileLines)
         {
             Console.WriteLine("Running in auto, verbose is " + verbose);
+            Console.WriteLine();
             try
             {
                 Interpreter.Interpret(fileLines, true, verbose);
@@ -29,6 +30,7 @@ namespace LogicSim
         public static void RunManual(bool verbose, string[] fileLines)
         {
             Console.WriteLine("Running in manual, verbose is " + verbose);
+            Console.WriteLine();
             try
             {
                 Interpreter.Interpret(fileLines, false, verbose);

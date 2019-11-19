@@ -5,7 +5,7 @@ namespace LogicSim
 {
     public static class Interpreter
     {
-        private static int currentLine = 0;
+        private static int currentLine;
         private static List<Variable> inputVariables = new List<Variable>();
         private static List<Variable> localVariables = new List<Variable>();
         private static List<Variable> outputVariables = new List<Variable>();
@@ -236,7 +236,6 @@ namespace LogicSim
         {
             foreach (string line in fileLines)
             {
-                currentLine++;
 
                 string evalLine = line.Trim();
 
@@ -266,7 +265,6 @@ namespace LogicSim
         {
             foreach (string line in fileLines)
             {
-                currentLine++;
 
                 string evalLine = line.Trim();
 
@@ -511,20 +509,26 @@ namespace LogicSim
                     {
                         commandArgs.Add("1");
                     }
-
-                    if (c == "0")
+                    else if (c == "0")
                     {
                         commandArgs.Add("0");
                     }
-                    Variable inputVar = GetInputVariableWithName(c);
-                    Variable localVar = GetLocalVariableWithName(c);
-                    if (inputVar != null)
+                    else if (GetInputVariableWithName(c) != null || GetLocalVariableWithName(c) != null)
                     {
-                        commandArgs.Add(inputVar.name);
+                        Variable inputVar = GetInputVariableWithName(c);
+                        Variable localVar = GetLocalVariableWithName(c);
+                        if (inputVar != null)
+                        {
+                            commandArgs.Add(inputVar.name);
+                        }
+                        if (localVar != null)
+                        {
+                            commandArgs.Add(localVar.name);
+                        }  
                     }
-                    if (localVar != null)
+                    else
                     {
-                        commandArgs.Add(localVar.name);
+                        throw new InterpreterException(currentLine, $"Undefined variable {c}");
                     }
                 }
             }
