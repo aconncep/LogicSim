@@ -10,40 +10,6 @@ namespace LogicSim
         private static List<Variable> localVariables = new List<Variable>();
         private static List<Variable> outputVariables = new List<Variable>();
         
-        private static void SetInputVariableValues(string binaryStr)
-        {
-            int varIdx = 0;
-            foreach (char c in binaryStr)
-            {
-                inputVariables[varIdx].value = (int)Char.GetNumericValue(c);
-                varIdx++;
-            }
-            
-        }
-        public static Variable GetInputVariableWithName(string name)
-        {
-            foreach (Variable var in inputVariables)
-            {
-                if (var.name == name)
-                {
-                    return var;
-                }
-            }
-            return null;
-        }
-        
-        public static Variable GetLocalVariableWithName(string name)
-        {
-            foreach (Variable var in localVariables)
-            {
-                if (var.name == name)
-                {
-                    return var;
-                }
-            }
-            return null;
-        }
-
         public static void Interpret(string[] fileLines, bool auto, bool verbose)
         {
             CheckForMissingLines(fileLines);
@@ -68,7 +34,7 @@ namespace LogicSim
                         Console.WriteLine("Current input variables: ");
                         foreach (Variable inputV in inputVariables)
                         {
-                            Console.Write(inputV.name + ": " + inputV.value + "  ");
+                            Console.Write(inputV.Name + ": " + inputV.Value + "  ");
                         }
                         Console.WriteLine();
                     }
@@ -80,25 +46,20 @@ namespace LogicSim
                 
                         string evalLine = line.Trim();
 
-                        if (evalLine.Length == 0)
-                        {
-                            continue;
-                        }                
-                
-                        if (LineStartsWithPound(evalLine))
+                        if (evalLine.Length == 0 || line[0].ToString() == "#")
                         {
                             continue;
                         }
 
-                        evalLine = RemoveInlineComments(evalLine);
+                        evalLine = StringUtilities.RemoveInlineComments(evalLine);
 
                         if (evalLine.Contains('='))
                         {
                             string variableName = evalLine.Substring(0, evalLine.IndexOf('=')-1);
                     
-                            evalLine = TrimVariableAssignment(evalLine);
+                            evalLine = StringUtilities.TrimVariableAssignment(evalLine);
 
-                            localVariables.Add(new Variable(variableName, Computer.ComputeCircuit(evalLine)));
+                            localVariables.Add(new Variable(variableName, Computer.ComputeCircuit(evalLine, currentLine)));
                         }
                     }
 
@@ -108,14 +69,14 @@ namespace LogicSim
                         {
                             foreach (Variable inputV in inputVariables)
                             {
-                                Console.Write(inputV.name + " ");
+                                Console.Write(inputV.Name + " ");
                             }
                             Console.Write("| ");
                             foreach (Variable outputV in outputVariables)
                             {
                                 if (localVariables.Contains(outputV))
                                 {
-                                    Console.Write(outputV.name + " ");
+                                    Console.Write(outputV.Name + " ");
                                 }
                             }
                             Console.WriteLine();
@@ -123,43 +84,47 @@ namespace LogicSim
 
                         printed = true;
                     }
-
+                    
+                    // running in auto verbose
                     if (verbose)
                     {
                         foreach (Variable localV in localVariables)
                         {
                             if (outputVariables.Contains(localV))
                             {
-                                Console.WriteLine("Output variable " + localV.name + " with value " + localV.value);
+                                Console.WriteLine("Output variable " + localV.Name + " with value " + localV.Value);
                             }
 
                             
                         } 
                         Console.WriteLine();
                     }
+                    // running in auto simple
                     else
                     {
                         foreach (Variable inputV in inputVariables)
                         {
-                            Console.Write(inputV.value + " ");
+                            Console.Write(inputV.Value + " ");
                         }
                         Console.Write("| ");
                         foreach (Variable localV in localVariables)
                         {
                             if (outputVariables.Contains(localV))
                             {
-                                Console.Write(localV.value + " ");
+                                Console.Write(localV.Value + " ");
                             }
 
                         }
                         Console.WriteLine();
                     }
 
-                    localVariables.Clear();
+                    localVariables.Clear(); // clear current localVarables list before running again (with new inputs)
                 }
                 
                 
             }
+            
+            // running in manual
             else
             {
                 while (true)
@@ -169,7 +134,7 @@ namespace LogicSim
                     {
                         while (true)
                         {
-                            Console.Write("Enter value for variable " + inputV.name + " [or x to quit]:  ");
+                            Console.Write("Enter value for variable " + inputV.Name + " [or x to quit]:  ");
                             char userIn = Console.ReadKey().KeyChar;
                             Console.WriteLine();
                             if (userIn == 'x' || userIn == 'X')
@@ -193,25 +158,20 @@ namespace LogicSim
 
                     string evalLine = line.Trim();
 
-                    if (evalLine.Length == 0)
+                    if (evalLine.Length == 0 || line[0].ToString() == "#")
                     {
                         continue;
                     }
-
-                    if (LineStartsWithPound(evalLine))
-                    {
-                        continue;
-                    }
-
-                    evalLine = RemoveInlineComments(evalLine);
+                    
+                    evalLine = StringUtilities.RemoveInlineComments(evalLine);
 
                     if (evalLine.Contains('='))
                     {
                         string variableName = evalLine.Substring(0, evalLine.IndexOf('=') - 1);
 
-                        evalLine = TrimVariableAssignment(evalLine);
+                        evalLine = StringUtilities.TrimVariableAssignment(evalLine);
 
-                        localVariables.Add(new Variable(variableName, Computer.ComputeCircuit(evalLine)));
+                        localVariables.Add(new Variable(variableName, Computer.ComputeCircuit(evalLine, currentLine)));
                     }
                 }
                 
@@ -219,77 +179,18 @@ namespace LogicSim
                 {
                     if (outputVariables.Contains(localV))
                     {
-                        Console.WriteLine("Output variable " + localV.name + " with value " + localV.value);
+                        Console.WriteLine("Output variable " + localV.Name + " with value " + localV.Value);
                     }
 
                             
                 } 
                 Console.WriteLine();
                 localVariables.Clear();
-
                 }
                 
             }
         }
         
-        private static void DetectInputVariables(string[] fileLines)
-        {
-            foreach (string line in fileLines)
-            {
-
-                string evalLine = line.Trim();
-
-                if (evalLine.Length == 0)
-                {
-                    continue;
-                }
-
-                if (LineStartsWithPound(evalLine))
-                {
-                    continue;
-                }
-
-                evalLine = RemoveInlineComments(evalLine);
-                if (evalLine.StartsWith("INPUTS ", StringComparison.CurrentCultureIgnoreCase))
-                {
-
-                    string variablesStr = evalLine.Substring(7, evalLine.Length - 7);
-
-                    inputVariables = BuildInputVariables(variablesStr);
-
-                }
-            }
-        }
-        
-        private static void DetectOutputVariables(string[] fileLines)
-        {
-            foreach (string line in fileLines)
-            {
-
-                string evalLine = line.Trim();
-
-                if (evalLine.Length == 0)
-                {
-                    continue;
-                }
-
-                if (LineStartsWithPound(evalLine))
-                {
-                    continue;
-                }
-
-                evalLine = RemoveInlineComments(evalLine);
-                if (evalLine.StartsWith("OUTPUT ", StringComparison.CurrentCultureIgnoreCase))
-                {
-
-                    string variablesStr = evalLine.Substring(7, evalLine.Length - 7);
-
-                    outputVariables = BuildOutputVariables(variablesStr);
-
-                }
-            }
-        }
-
         private static void CheckForMissingLines(string[] fileLines)
         {
             bool hasINPUTS = false;
@@ -318,34 +219,87 @@ namespace LogicSim
             }
 
         }
-        
-        private static bool LineStartsWithPound(string line)
+        private static void SetInputVariableValues(string binaryStr)
         {
-            return line[0].ToString() == "#";
-        }
-
-        private static string RemoveInlineComments(string line)
-        {
-            if (line.Contains('#'))
+            int varIdx = 0;
+            foreach (char c in binaryStr)
             {
-                line = line.Substring(0, line.IndexOf('#'));
-                if (line.EndsWith(' '))
-                {
-                    line = line.Substring(0, line.Length - 1);
-                    return line;
-                }
-                return line;
+                inputVariables[varIdx].Value = (int)Char.GetNumericValue(c);
+                varIdx++;
             }
-            return line;
+            
+        }
+        public static Variable GetInputVariableWithName(string name)
+        {
+            foreach (Variable var in inputVariables)
+            {
+                if (var.Name == name)
+                {
+                    return var;
+                }
+            }
+            return null;
         }
         
-
-        private static string TrimVariableAssignment(string line)
+        public static Variable GetLocalVariableWithName(string name)
         {
-            int equalsIndex = line.IndexOf('=');
-            return line.Substring(equalsIndex+1, (line.Length-1)-equalsIndex).Trim();
+            foreach (Variable var in localVariables)
+            {
+                if (var.Name == name)
+                {
+                    return var;
+                }
+            }
+            return null;
         }
+        
+        private static void DetectInputVariables(string[] fileLines)
+        {
+            foreach (string line in fileLines)
+            {
+                string evalLine = line.Trim();
 
+                if (evalLine.Length == 0 || line[0].ToString() == "#")
+                {
+                    continue;
+                }
+
+                evalLine = StringUtilities.RemoveInlineComments(evalLine);
+                if (evalLine.StartsWith("INPUTS ", StringComparison.CurrentCultureIgnoreCase))
+                {
+
+                    string variablesStr = evalLine.Substring(7, evalLine.Length - 7);
+
+                    inputVariables = BuildInputVariables(variablesStr);
+
+                }
+            }
+        }
+        
+        private static void DetectOutputVariables(string[] fileLines)
+        {
+            foreach (string line in fileLines)
+            {
+
+                string evalLine = line.Trim();
+
+                if (evalLine.Length == 0 || line[0].ToString() == "#")
+                {
+                    continue;
+                }
+
+                evalLine = StringUtilities.RemoveInlineComments(evalLine);
+                if (evalLine.StartsWith("OUTPUT ", StringComparison.CurrentCultureIgnoreCase))
+                {
+
+                    string variablesStr = evalLine.Substring(7, evalLine.Length - 7);
+
+                    outputVariables = BuildOutputVariables(variablesStr);
+
+                }
+            }
+        }
+        
         private static List<Variable> BuildInputVariables(string inputString)
         {
             string thisVar = "";
@@ -441,7 +395,7 @@ namespace LogicSim
             bool exists = false;
             foreach (Variable inputVar in inputVariables)
             {
-                if (inputVar.name == variable)
+                if (inputVar.Name == variable)
                 {
                     exists = true;
                 }
@@ -455,19 +409,13 @@ namespace LogicSim
             bool exists = false;
             foreach (Variable outputVar in outputVariables)
             {
-                if (outputVar.name == variable)
+                if (outputVar.Name == variable)
                 {
                     exists = true;
                 }
             }
 
             return exists;
-        }
-
-        public static string DetermineOuterCommand(string line)
-        {
-            int openParenthesisIndex = line.IndexOf('(');
-            return line.Substring(0, openParenthesisIndex);
         }
         
         /// <summary>
@@ -482,7 +430,7 @@ namespace LogicSim
             
             List<string> commandArgs = new List<string>();
 
-            if (DetermineOuterCommand(line) == "NOT")
+            if (StringUtilities.DetermineOuterCommand(line) == "NOT")
             {
                 commandArgs.Add(innerCommandString);
                 return commandArgs;
@@ -519,11 +467,11 @@ namespace LogicSim
                         Variable localVar = GetLocalVariableWithName(c);
                         if (inputVar != null)
                         {
-                            commandArgs.Add(inputVar.name);
+                            commandArgs.Add(inputVar.Name);
                         }
                         if (localVar != null)
                         {
-                            commandArgs.Add(localVar.name);
+                            commandArgs.Add(localVar.Name);
                         }  
                     }
                     else
@@ -535,49 +483,12 @@ namespace LogicSim
             
             else
             {
-                commandArgs.Add(innerCommandString.Substring(0,FindThisCommandsComma(innerCommandString)));
-                commandArgs.Add(innerCommandString.Substring(FindThisCommandsComma(innerCommandString)+1,innerCommandString.Length - commandArgs[0].Length-1));
+                
+                commandArgs.Add(innerCommandString.Substring(0,StringUtilities.FindThisCommandsComma(innerCommandString)));
+                commandArgs.Add(innerCommandString.Substring(StringUtilities.FindThisCommandsComma(innerCommandString)+1,innerCommandString.Length - commandArgs[0].Length-1));
             }
             
             return commandArgs;
-        }
-        private static int FindThisCommandsComma(string line)
-        {
-            
-            int firstParenthesisIdx = line.IndexOf('(') + 1;
-            int firstCommaIdx = line.IndexOf(',');
-            string trimmedLine = line.Substring(line.IndexOf('(')+1);
-            int parenthesisCount = 1;
-            int idx = 0;
-            
-            foreach (char c in trimmedLine)
-            {
-                idx++;
-                
-                if (c == '(')
-                {
-                    parenthesisCount++;
-                }
-
-                if (c == ')')
-                {
-                    parenthesisCount--;
-                }
-
-                if (parenthesisCount == 0)
-                {
-                    break;
-                }
-            }
-
-            if (firstCommaIdx < firstParenthesisIdx )
-            {
-                return firstCommaIdx;
-            }
-            else
-            {
-                return firstParenthesisIdx + idx;
-            }
         }
     }
 }

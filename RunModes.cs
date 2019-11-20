@@ -21,10 +21,10 @@ namespace LogicSim
             {
                 Console.WriteLine(e.Message);
             }
-            catch (SystemException e)
-            {
-                Console.WriteLine("Something went wrong. Check your HDL file and try again.");
-            }
+            //catch (SystemException e)
+            //{
+                //Console.WriteLine("Something went wrong. Check your HDL file and try again.");
+            //}
         }
 
         public static void RunManual(bool verbose, string[] fileLines)

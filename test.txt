@@ -2,7 +2,7 @@
 
 INPUTS A,B,C
 
-w1 = AND(1,B)
-w2 = NAND(XOR(B,C),OR(AND(1,A),NAND(A,C)))
+w1 = AND(A,B)
+w2 = AND(w1,C)
 
 OUTPUT w1,w2

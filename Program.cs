@@ -150,8 +150,5 @@ namespace LogicSim
         {
             return string.Equals(str1, str2, StringComparison.OrdinalIgnoreCase);
         }
-        
-        
-
     }
 }
