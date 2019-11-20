@@ -32,6 +32,11 @@ namespace LogicSim
         
         public static int FindThisCommandsComma(string line)
         {
+            string singleVarTest = line.Substring(0, line.IndexOf(','));
+            if (!singleVarTest.Contains('('))
+            {
+                return singleVarTest.Length;
+            }
             int parenthesisCount = 0;
             int idx = 0;
 

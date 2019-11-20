@@ -3,6 +3,6 @@
 INPUTS A,B,C
 
 w1 = AND(A,B)
-w2 = AND(w1,C)
+w3 = XOR(w1,w1)
 
-OUTPUT w1,w2
+OUTPUT w3
