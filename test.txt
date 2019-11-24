@@ -1,8 +1,9 @@
 ﻿# Test program
 
-INPUTS A,B,C
+INPUTS A,B,C,D,E,F,G
 
 w1 = AND(A,B)
-w3 = XOR(w1,w1)
+w2 = NAND(E,AND(D,G))
+w3 = XOR(NOT(A),OR(w2,C))
 
 OUTPUT w3

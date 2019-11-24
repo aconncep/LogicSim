@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace LogicSim
 {
@@ -10,7 +11,7 @@ namespace LogicSim
         private static List<Variable> localVariables = new List<Variable>();
         private static List<Variable> outputVariables = new List<Variable>();
         
-        public static void Interpret(string[] fileLines, bool auto, bool verbose)
+        public static void Interpret(string[] fileLines, bool auto, bool verbose, int delay)
         {
             CheckForMissingLines(fileLines);
 
@@ -119,6 +120,7 @@ namespace LogicSim
                     }
 
                     localVariables.Clear(); // clear current localVarables list before running again (with new inputs)
+                    Thread.Sleep(delay);
                 }
                 
                 
@@ -141,7 +143,7 @@ namespace LogicSim
                             {
                                 Environment.Exit(0);
                             }
-                            if (userIn != '0' && userIn != '1')
+                            else if (userIn != '0' && userIn != '1')
                             {
                                 Console.WriteLine("Invalid input");
                                 continue;
@@ -433,6 +435,10 @@ namespace LogicSim
             if (StringUtilities.DetermineOuterCommand(line) == "NOT")
             {
                 commandArgs.Add(innerCommandString);
+                if (commandArgs[0].Contains(','))
+                {
+                    throw new InterpreterException(currentLine, "Too many arguments passed to NOT command");
+                }
                 return commandArgs;
             }
             
@@ -453,7 +459,11 @@ namespace LogicSim
                 string[] innerCommandSplit = innerCommandString.Split(',');
                 foreach (string c in innerCommandSplit)
                 {
-                    if (c == "1")
+                    if (c == String.Empty)
+                    {
+                        throw new InterpreterException(currentLine, $"Missing argument for {line}");
+                    }
+                    else if (c == "1")
                     {
                         commandArgs.Add("1");
                     }

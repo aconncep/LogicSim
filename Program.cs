@@ -146,7 +146,7 @@ namespace LogicSim
             }
         }
 
-        static bool CompareArgStrings(string str1, string str2)
+        private static bool CompareArgStrings(string str1, string str2)
         {
             return string.Equals(str1, str2, StringComparison.OrdinalIgnoreCase);
         }
