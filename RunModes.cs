@@ -1,64 +1,66 @@
 using System;
-using System.Diagnostics;
+using System.Collections.Generic;
 
 namespace LogicSim
 {
-    public enum RunLabel
+    public static class RunModes
     {
-        AUTO,MANUAL,SIMPLE,VERBOSE
-    }
-    
-    public class RunModes
-    {
-        private static Stopwatch _stopwatch = new Stopwatch();
-        public static void RunAuto(bool verbose, string[] fileLines)
+        private static CircuitGroup _circuitGroup = new CircuitGroup();
+        
+        
+        
+        /// <summary>
+        /// This function is called right when the program starts and a file is found.
+        /// It populates the mainCircuit with circuit data to be used throughout the rest
+        /// of the program's lifespan.
+        /// </summary>
+        /// <param name="fileLines"></param>
+        public static void GenerateCircuit(string[] fileLines)
         {
-            Console.WriteLine("Running in auto, verbose is " + verbose);
-            Console.WriteLine();
-            Console.Write("Enter calculation delay in milliseconds (or 0 for instantaneous): ");
-            string userIn = Console.ReadLine();
-            try
+            Interpreter.CheckForMissingLines(fileLines);
+            Combination currentInputs = Interpreter.GetInputVariables(fileLines, out var numInputs);
+            _circuitGroup.mainCircuit.NumberInputs = numInputs;
+
+            for (int i = 0; i < Math.Pow(2, numInputs); i++)
             {
-                int delay = Int32.Parse(userIn);
-                _stopwatch.Start();
-                Interpreter.Interpret(fileLines, true, verbose, delay);
-                _stopwatch.Stop();
-                Console.WriteLine(
-                    $"Calculated in {_stopwatch.ElapsedMilliseconds} ms ({_stopwatch.ElapsedMilliseconds / 1000.0} sec.)");
+                currentInputs = Interpreter.GetInputVariables(fileLines, out var numberInpurts);
+                string binaryStr = Convert.ToString(i, 2).PadLeft(numInputs, '0');
+                
+                int varIdx = 0;
+                foreach (char c in binaryStr)
+                {
+                    currentInputs.combination[varIdx].Value = (int)Char.GetNumericValue(c);
+                    varIdx++;
+                }
+
+                Combination currentOutputs = Interpreter.Interpret(currentInputs.combination, fileLines);
+                
+                _circuitGroup.mainCircuit.AddCombination(currentInputs, currentOutputs);
 
             }
-            catch (FormatException)
-            {
-                Console.WriteLine($"Invalid delay time [{userIn}], restarting...");
-                Console.WriteLine();
-                RunAuto(verbose, fileLines);
-            }
-            catch (InterpreterException e)
-            {
-                Console.WriteLine(e.Message);
-            }
-            catch (SystemException e)
-            {
-                Console.WriteLine("Something went wrong. Check your HDL file and try again.");
-            }
+        }
+        
+
+        public static void RunAuto()
+        {
+            Console.WriteLine("Simulating circuit...\n");
+            _circuitGroup.mainCircuit.Print();
+            Console.WriteLine("Press any key to continue...");
+            Console.ReadLine();
         }
 
-        public static void RunManual(bool verbose, string[] fileLines)
+        public static void RunManual()
         {
-            Console.WriteLine("Running in manual, verbose is " + verbose);
-            Console.WriteLine();
-            try
+            Combination inputCombo = new Combination();
+            for (int i = 0; i < _circuitGroup.mainCircuit.NumberInputs; i++)
             {
-                Interpreter.Interpret(fileLines, false, verbose, 0);
+                Variable currentInput = _circuitGroup.mainCircuit.GetInputVariables().combination[i];
+                Console.Write("Enter a value for input variable [" + currentInput.Name+"]: ");
+                int userIn = int.Parse(Console.ReadLine());
+                inputCombo.SetVariable(currentInput.Name, userIn);
             }
-            catch (InterpreterException e)
-            {
-                Console.WriteLine(e.Message);
-            }
-            catch (SystemException e)
-            {
-                Console.WriteLine("Something went wrong. Check your HDL file and try again.");
-            }
+            Console.WriteLine(_circuitGroup.mainCircuit.GetOutputForInput(inputCombo));
         }
+        
     }
 }

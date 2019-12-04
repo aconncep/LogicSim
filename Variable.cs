@@ -1,7 +1,12 @@
 namespace LogicSim
 {
+    public enum VariableType
+    {
+        INPUT,LOCAL,OUTPUT
+    }
     public class Variable
     {
+        public readonly VariableType type;
         public readonly string Name;
         private int _value;
         public int Value
@@ -16,10 +21,11 @@ namespace LogicSim
             }
         }
 
-        public Variable(string name, int value)
+        public Variable(string name, int value, VariableType type)
         {
             Name = name;
             Value = value;
+            this.type = type;
         }
 
         public override bool Equals(object obj)
@@ -27,7 +33,7 @@ namespace LogicSim
             if (obj is Variable)
             {
                 Variable otherVar = (Variable) obj;
-                return otherVar.Name == Name;
+                return otherVar.Name == Name && otherVar._value == _value;
             }
             return false;
         }
@@ -39,7 +45,7 @@ namespace LogicSim
 
         public override string ToString()
         {
-            return Name;
+            return Name + ": " + Value;
         }
     }
 }

@@ -10,7 +10,7 @@ namespace LogicSim
         /// Computes from the inside out and ultimately returns 0/1
         /// </summary>
         /// <returns>Computation (0/1) of current command</returns>
-        public static int ComputeCircuit(string currentCommand, int currentLine)
+        public static int ComputeCircuit(string currentCommand, int currentLine, List<Variable> inputVariables, List<Variable> localVariables)
         {
             // (base case) we're dealing with a hard-coded value
             if (currentCommand == "0" || currentCommand == "1")
@@ -19,20 +19,20 @@ namespace LogicSim
             }
 
             // (base case) if this command is a variable, return that variables value
-            Variable inputV = Interpreter.GetInputVariableWithName(currentCommand);
-            Variable localV = Interpreter.GetLocalVariableWithName(currentCommand);
+            Variable inputV = Interpreter.GetInputVariableWithName(currentCommand, inputVariables);
+            Variable localV = Interpreter.GetLocalVariableWithName(currentCommand, localVariables);
             if (inputV != null) { return inputV.Value ; }
             if (localV != null) { return localV.Value ; }
 
 
             // get a list of the arguments to this command
-            List<string> commandArgs = Interpreter.GetCommandArgs(currentCommand);
+            List<string> commandArgs = Interpreter.GetCommandArgs(currentCommand, inputVariables);
             
 
             // this is a NOT command
             if (commandArgs.Count == 1)
             {
-                return Commands.NOT(ComputeCircuit(commandArgs[0], currentLine));
+                return Commands.NOT(ComputeCircuit(commandArgs[0], currentLine, inputVariables, localVariables));
             }
             
             // this is any other command (all of which requires two args)
@@ -40,17 +40,17 @@ namespace LogicSim
             switch (outerCommand)
             {
                 case "AND":
-                    return Commands.AND(ComputeCircuit(commandArgs[0], currentLine), ComputeCircuit(commandArgs[1], currentLine));
+                    return Commands.AND(ComputeCircuit(commandArgs[0], currentLine, inputVariables, localVariables), ComputeCircuit(commandArgs[1], currentLine, inputVariables, localVariables));
                 case "OR":
-                    return Commands.OR(ComputeCircuit(commandArgs[0], currentLine), ComputeCircuit(commandArgs[1], currentLine));
+                    return Commands.OR(ComputeCircuit(commandArgs[0], currentLine, inputVariables, localVariables), ComputeCircuit(commandArgs[1], currentLine, inputVariables, localVariables));
                 case "NAND":
-                    return Commands.NAND(ComputeCircuit(commandArgs[0], currentLine), ComputeCircuit(commandArgs[1], currentLine));
+                    return Commands.NAND(ComputeCircuit(commandArgs[0], currentLine, inputVariables, localVariables), ComputeCircuit(commandArgs[1], currentLine, inputVariables, localVariables));
                 case "NOR":
-                    return Commands.NOR(ComputeCircuit(commandArgs[0], currentLine), ComputeCircuit(commandArgs[1], currentLine));
+                    return Commands.NOR(ComputeCircuit(commandArgs[0], currentLine, inputVariables, localVariables), ComputeCircuit(commandArgs[1], currentLine, inputVariables, localVariables));
                 case "XOR":
-                    return Commands.XOR(ComputeCircuit(commandArgs[0], currentLine), ComputeCircuit(commandArgs[1], currentLine));
+                    return Commands.XOR(ComputeCircuit(commandArgs[0], currentLine, inputVariables, localVariables), ComputeCircuit(commandArgs[1], currentLine, inputVariables, localVariables));
                 case "XNOR":
-                    return Commands.XNOR(ComputeCircuit(commandArgs[0], currentLine), ComputeCircuit(commandArgs[1], currentLine));
+                    return Commands.XNOR(ComputeCircuit(commandArgs[0], currentLine, inputVariables, localVariables), ComputeCircuit(commandArgs[1], currentLine, inputVariables, localVariables));
                 default:
                     throw new InterpreterException(currentLine, $"Invalid command [{outerCommand}]");
             }
