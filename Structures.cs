@@ -1,165 +1,158 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
+using System.Threading;
 
 namespace LogicSim
 {
     public class Circuit
     {
-        
-        private Dictionary<Combination, Combination> inputToLocal = new Dictionary<Combination, Combination>();
+        private SortedList<int, Combination> combinations = new SortedList<int, Combination>();
+        public int NumInputs => combinations[0].NumInputs;
+        public int NumOutputs => combinations[0].NumOutputs;
 
-        public int NumberInputs;
-
-
-        public void AddCombination(Combination inputCombo, Combination outputCombo)
+        public void AddCombination(int position, Combination newCombo)
         {
-            inputToLocal.Add(inputCombo, outputCombo);
+            combinations.Add(position, newCombo);
         }
 
-        public Combination GetOutputForInput(Combination inputCombo)
+        public void PrintWithDelay(int delay)
         {
-            return inputToLocal[inputCombo];
-        }
-
-        public Combination GetInputVariables()
-        {
-            return inputToLocal.ElementAt(0).Key;
-        }
-
-
-        public int NumberCombos()
-        {
-            return Convert.ToInt16(Math.Pow(2, NumberInputs));
-        }
-
-        public void PrintHeader()
-        {
-            StringBuilder topLine = new StringBuilder();
-            int idx = 0;
-            foreach (KeyValuePair<Combination, Combination> combo in inputToLocal)
+            Console.WriteLine();
+            Console.WriteLine(combinations[0].GetTitleLine());
+            foreach (int i in combinations.Keys)
             {
-                if (idx == 0)
-                {
-                    foreach (Variable v in combo.Key.combination)
-                    {
-                        if (v.type == VariableType.INPUT)
-                        {
-                            topLine.Append(v.Name + " ");
-                        }
-                    }
-
-                    topLine.Append(" | ");
-
-                    foreach (Variable v in combo.Value.combination)
-                    {
-                        if (v.type == VariableType.LOCAL)
-                        {
-                            topLine.Append(v.Name + " ");
-                        }
-                    }
-                }
+                Thread.Sleep(delay);
+                Console.WriteLine(combinations[i]);
             }
-
-            Console.WriteLine(topLine);
         }
-        
-        
-        public void Print()
+
+        public void PrintIndividualComboOutput(List<Variable> inputCombo)
         {
-            StringBuilder topLine = new StringBuilder();
             int idx = 0;
-            foreach (KeyValuePair<Combination,Combination> combo in inputToLocal)
+            foreach (Combination combo in combinations.Values)
             {
-                if (idx == 0)
+                if (combo.GetInputs().SequenceEqual(inputCombo))
                 {
-                    foreach (Variable v in combo.Key.combination)
-                    {
-                        if (v.type == VariableType.INPUT)
-                        {
-                            topLine.Append(v.Name + " ");
-                        }
-                    }
-                    
-                    topLine.Append(" | ");
-                    
-                    foreach (Variable v in combo.Value.combination)
-                    {
-                        if (v.type == VariableType.LOCAL)
-                        {
-                            topLine.Append(v.Name + " ");
-                        }
-                    }
-                }
-                
-
-                topLine.Append('\n');
-
-                foreach (Variable v in combo.Key.combination)
-                {
-                    if (v.type == VariableType.INPUT)
-                    {
-                        topLine.Append(v.Value + " ");
-                    }
-                }
-                
-                topLine.Append(" | ");
-                
-                foreach (Variable v in combo.Value.combination)
-                {
-                    if (v.type == VariableType.LOCAL)
-                    {
-                        topLine.Append(v.Value + " ");
-                    }
+                    Console.WriteLine(combinations[idx].GetLocalsFormatted());
+                    break;
                 }
                 idx++;
             }
-
-            Console.WriteLine(topLine + "\n");
-        }
-    }
             
-    public class CircuitGroup
-    {
-        // the main circuit to be computed
-        public Circuit mainCircuit = new Circuit();
+            // invalid input
+        }
+
+        public List<Variable> GetInputVariables()
+        {
+            return combinations[0].GetInputs();
+        }
         
-        // When the user modifies the circuit in-program, represent it here
-        public Circuit modifiedCircuit = new Circuit();
+        public override string ToString()
+        {
+            StringBuilder sb = new StringBuilder();
+            Console.WriteLine();
+            sb.Append(combinations[0].GetTitleLine()+"\n");
+            foreach (int i in combinations.Keys)
+            {
+                sb.Append(combinations[i] + "\n");
+            }
+
+            return sb.ToString();
+        }
     }
 
     public class Combination
     {
-        public List<Variable> combination;
+        private readonly List<Variable> inputs;
+        private readonly List<Variable> locals;
+
+        public int NumInputs => inputs.Count;
+
+        public int NumOutputs => locals.Count;
 
         public Combination()
         {
-            combination = new List<Variable>();
-        }
-        public Combination(List<Variable> input)
-        {
-            combination = input;
+            inputs = new List<Variable>();
+            locals = new List<Variable>();
         }
 
-        public void SetVariable(string name, int value)
+        public void AddInput(Variable newVar)
         {
-            if (combination.Contains(new Variable(name, value, VariableType.INPUT)))
+            if (newVar != null)
             {
-                foreach (Variable v in combination)
-                {
-                    if (v.Name == name)
-                    {
-                        v.Value = value;
-                    }
-                }
+                inputs.Add(newVar);
             }
-            else
+        }
+        public Combination(List<Variable> inputs, List<Variable> locals)
+        {
+            this.inputs = inputs;
+            this.locals = locals;
+        }
+
+        public List<Variable> GetInputs()
+        {
+            return inputs;
+        }
+        
+        public List<Variable> GetLocals()
+        {
+            return locals;
+        }
+        
+        public string GetTitleLine()
+        {
+            StringBuilder sb = new StringBuilder();
+            foreach (Variable inputv in inputs)
             {
-                combination.Add(new Variable(name, value, VariableType.INPUT));
+                sb.Append(inputv.Name + " ");
+            }
+
+            sb.Remove(sb.Length - 1, 1);
+
+            sb.Append(" | ");
+            foreach (Variable localv in locals)
+            {
+                sb.Append(localv.Name + " ");
+            }
+            sb.Remove(sb.Length - 1, 1);
+
+            return sb.ToString();
+        }
+
+        public string GetLocalsFormatted()
+        {
+            StringBuilder sb = new StringBuilder();
+            foreach (Variable v in locals)
+            {
+                sb.Append(v.Name + ": " + v.Value + "  ");
+            }
+
+            sb.Append("\n");
+            return sb.ToString();
+        }
+
+        public override string ToString()
+        {
+            StringBuilder sb = new StringBuilder();
+            foreach (Variable inputv in inputs)
+            {
+                sb.Append(' ', inputv.Name.Length - 1);
+                sb.Append(inputv.Value + " ");
             }
             
+            sb.Remove(sb.Length - 1, 1);
+            
+            sb.Append(" | ");
+            foreach (Variable localv in locals)
+            {
+                sb.Append(' ', localv.Name.Length - 1);
+                sb.Append(localv.Value + " ");
+            }
+            sb.Remove(sb.Length - 1, 1);
+
+            return sb.ToString();
         }
 
         public override bool Equals(object obj)
@@ -167,40 +160,20 @@ namespace LogicSim
             if (obj is Combination)
             {
                 Combination otherCombo = (Combination) obj;
-
-                if (otherCombo.combination.Count != combination.Count)
-                {
-                    return false;
-                }
-
-                for (int idx = 0; idx < combination.Count; idx++)
-                {
-                    if (!otherCombo.combination[idx].Equals(combination[idx]))
-                    {
-                        return false;
-                    }
-
-                }
-                
-                return true;
+                return otherCombo.inputs == inputs && otherCombo.locals == locals;
             }
             return false;
         }
 
         public override int GetHashCode()
         {
-            return 100;
-        }
-
-        public override string ToString()
-        {
-            StringBuilder b = new StringBuilder();
-            foreach (Variable v in combination)
-            {
-                b.Append(v.Name + ": " + v.Value + "   ");
-            }
-
-            return b.ToString();
+            return 200;
         }
     }
+
+    static class CircuitGroup
+    {
+        public static readonly Circuit mainCircuit = new Circuit();
+    }
+
 }

@@ -5,9 +5,6 @@ namespace LogicSim
 {
     public static class RunModes
     {
-        private static CircuitGroup _circuitGroup = new CircuitGroup();
-
-
         /// <summary>
         /// This function is called right when the program starts and a file is found.
         /// It populates the mainCircuit with circuit data to be used throughout the rest
@@ -17,34 +14,73 @@ namespace LogicSim
         public static void GenerateCircuit(string[] fileLines)
         {
             Interpreter.CheckForMissingLines(fileLines);
-            Combination currentInputs = Interpreter.GetInputVariables(fileLines, out var numInputs);
-            _circuitGroup.mainCircuit.NumberInputs = numInputs;
+            List<Variable> currentInputs = Interpreter.GetInputVariables(fileLines);
+            int numInputs = currentInputs.Count;
 
+            int currentComboNumber = 0;
             for (int i = 0; i < Math.Pow(2, numInputs); i++)
             {
-                currentInputs = Interpreter.GetInputVariables(fileLines, out var numberInpurts);
+                currentInputs = Interpreter.GetInputVariables(fileLines);
                 string binaryStr = Convert.ToString(i, 2).PadLeft(numInputs, '0');
 
                 int varIdx = 0;
                 foreach (char c in binaryStr)
                 {
-                    currentInputs.combination[varIdx].Value = (int) Char.GetNumericValue(c);
+                    currentInputs[varIdx].Value = (int) Char.GetNumericValue(c);
                     varIdx++;
                 }
 
-                Combination currentOutputs = Interpreter.Interpret(currentInputs.combination, fileLines);
+                // take the currently set inputs and return a list of local variables after interpreting the file with those inputs
+                List<Variable> currentLocals = Interpreter.Interpret(fileLines, currentInputs);
 
-                _circuitGroup.mainCircuit.AddCombination(currentInputs, currentOutputs);
+                // create a new combo out of the current inputs and outputs
+                Combination completeCombo = new Combination(currentInputs, currentLocals);
+
+                // add the new combo to the circuit
+                CircuitGroup.mainCircuit.AddCombination(currentComboNumber, completeCombo);
+
+                currentComboNumber++;
             }
         }
 
-
         public static void RunAuto()
         {
-            Console.WriteLine("Simulating circuit...\n");
-            _circuitGroup.mainCircuit.Print();
-            Console.WriteLine("Press any key to continue...");
-            Console.ReadLine();
+            while (true)
+            {
+                Console.Write("Enter simulation delay (0 for instantaneous): ");
+                try
+                {
+                    int delay = int.Parse(Console.ReadLine());
+                    if (delay < 0)
+                    {
+                        Console.WriteLine("Invalid input. Try again.\n");
+                        continue;
+                    }
+
+                    if (delay == 0)
+                    {
+                        Console.WriteLine("Simulating circuit...");
+                        Console.WriteLine(CircuitGroup.mainCircuit);
+                        Console.WriteLine("Press any key to continue...");
+                        Console.WriteLine();
+                        Console.ReadKey();
+                    }
+                    else
+                    {
+                        Console.WriteLine("Simulating circuit...");
+                        CircuitGroup.mainCircuit.PrintWithDelay(delay);
+                        Console.WriteLine();
+                        Console.WriteLine("Press any key to continue...\n");
+                        Console.ReadKey();
+                    }
+
+                    break;
+                }
+                catch (FormatException)
+                {
+                    Console.WriteLine("Invalid input. Try again.");
+                }
+            }
         }
 
         public static void RunManual()
@@ -52,10 +88,10 @@ namespace LogicSim
             bool cont = true;
             while (cont)
             {
-                Combination inputCombo = new Combination();
-                for (int i = 0; i < _circuitGroup.mainCircuit.NumberInputs; i++)
+                List<Variable> newInputs = new List<Variable>();
+                for (int i = 0; i < CircuitGroup.mainCircuit.NumInputs; i++)
                 {
-                    Variable currentInput = _circuitGroup.mainCircuit.GetInputVariables().combination[i];
+                    Variable currentInput = CircuitGroup.mainCircuit.GetInputVariables()[i];
                     int result = RunManualOnce(currentInput.Name);
                     if (result == -2)
                     {
@@ -66,12 +102,12 @@ namespace LogicSim
                     {
                         result = RunManualOnce(currentInput.Name);
                     }
-                    inputCombo.SetVariable(currentInput.Name, result);
+                    newInputs.Add(new Variable(currentInput.Name, result, VariableType.INPUT));
                 }
 
                 if (cont == true)
                 {
-                    Console.WriteLine(_circuitGroup.mainCircuit.GetOutputForInput(inputCombo));
+                    CircuitGroup.mainCircuit.PrintIndividualComboOutput(newInputs);
                     Console.WriteLine();
                 }
             }
@@ -81,7 +117,7 @@ namespace LogicSim
 
         public static int RunManualOnce(string variableName)
         {
-            Console.Write("Enter value for input [" + variableName + "]: ");
+            Console.Write("Enter value for input [" + variableName + "] (or x to quit): ");
             string userIn = Console.ReadLine();
 
             if (userIn == "x" || userIn == "X")
@@ -110,4 +146,5 @@ namespace LogicSim
             return -1;
         }
     }
+    
 }

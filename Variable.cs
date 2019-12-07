@@ -33,14 +33,14 @@ namespace LogicSim
             if (obj is Variable)
             {
                 Variable otherVar = (Variable) obj;
-                return otherVar.Name == Name && otherVar._value == _value;
+                return otherVar.Name == Name && otherVar.Value == Value;
             }
             return false;
         }
 
         public override int GetHashCode()
         {
-            return (Name != null ? Name.GetHashCode() : 0);
+            return 100;
         }
 
         public override string ToString()

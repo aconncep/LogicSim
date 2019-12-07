@@ -17,13 +17,18 @@ namespace LogicSim
                 try
                 {
                     string[] lines = File.ReadAllLines(args[0]);
-                    Console.WriteLine("HDL file detected.\n");
+                    Console.WriteLine("HDL file detected.");
                     RunModes.GenerateCircuit(lines);
+                    Console.WriteLine("Successfully processed file.\n");
                     RunFullMenu();
                 }
-                catch (Exception )
+                catch (InterpreterException e)
                 {
-                    Console.WriteLine("Unable to read specified HDL file. Check file path and run again.");
+                    Console.WriteLine(e.Message);
+                }
+                catch (Exception)
+                {
+                    Console.WriteLine("Unable to process specified HDL file. Check file path and file contents, then run again.");
                     Console.WriteLine("Some program functionality will be unavailable.\n");
                     RunShortMenu();
                 }

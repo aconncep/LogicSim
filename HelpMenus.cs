@@ -13,7 +13,7 @@ namespace LogicSim
         
         public static void HelpSimulateManual()
         {
-            Console.WriteLine("LogicSim will ask you for input values to use in your circuit, then it will simulate your circuit with those inputs.");
+            Console.WriteLine("LogicSim will ask you for input values, then it will simulate your circuit with those inputs and return the values of the output variables.");
         }
         
         public static void HelpStepInputs()
