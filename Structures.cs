@@ -30,6 +30,43 @@ namespace LogicSim
         }
 
 
+        public int NumberCombos()
+        {
+            return Convert.ToInt16(Math.Pow(2, NumberInputs));
+        }
+
+        public void PrintHeader()
+        {
+            StringBuilder topLine = new StringBuilder();
+            int idx = 0;
+            foreach (KeyValuePair<Combination, Combination> combo in inputToLocal)
+            {
+                if (idx == 0)
+                {
+                    foreach (Variable v in combo.Key.combination)
+                    {
+                        if (v.type == VariableType.INPUT)
+                        {
+                            topLine.Append(v.Name + " ");
+                        }
+                    }
+
+                    topLine.Append(" | ");
+
+                    foreach (Variable v in combo.Value.combination)
+                    {
+                        if (v.type == VariableType.LOCAL)
+                        {
+                            topLine.Append(v.Name + " ");
+                        }
+                    }
+                }
+            }
+
+            Console.WriteLine(topLine);
+        }
+        
+        
         public void Print()
         {
             StringBuilder topLine = new StringBuilder();
@@ -160,7 +197,7 @@ namespace LogicSim
             StringBuilder b = new StringBuilder();
             foreach (Variable v in combination)
             {
-                b.Append(v.Value + " ");
+                b.Append(v.Name + ": " + v.Value + "   ");
             }
 
             return b.ToString();

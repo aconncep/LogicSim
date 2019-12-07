@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
@@ -9,30 +8,6 @@ namespace LogicSim
     {
         static void Main(string[] args)
         {
-            Variable v1 = new Variable("A", 0, VariableType.INPUT);
-            Variable v2 = new Variable("B", 1, VariableType.INPUT);
-            Variable v3 = new Variable("C", 1, VariableType.INPUT);
-            Variable v4 = new Variable("A", 0, VariableType.INPUT);
-            Variable v5 = new Variable("B", 1, VariableType.INPUT);
-            Variable v6 = new Variable("C", 1, VariableType.INPUT);
-            
-            List<Variable> list = new List<Variable>();
-            list.Add(v1);
-            list.Add(v2);
-            list.Add(v3);
-            
-            
-            List<Variable> list2 = new List<Variable>();
-            list2.Add(v4);
-            list2.Add(v5);
-            list2.Add(v6);
-            
-            Combination input = new Combination(list);
-            Combination output = new Combination(list2);
-            Console.WriteLine(input.Equals(output));
-            
-            
-            
             Console.WriteLine("LogicSim v3.0 by Austin Cepalia\n");
             Console.WriteLine("Looking for HDL file...");
             
@@ -46,7 +21,7 @@ namespace LogicSim
                     RunModes.GenerateCircuit(lines);
                     RunFullMenu();
                 }
-                catch (OutOfMemoryException e)
+                catch (Exception )
                 {
                     Console.WriteLine("Unable to read specified HDL file. Check file path and run again.");
                     Console.WriteLine("Some program functionality will be unavailable.\n");
