@@ -1,0 +1,10 @@
+﻿# Test program
+
+INPUTS A,B
+
+w1 = AND(A,B)
+w2 = AND(OR(A,B),A)
+w3 = NOT(OR(0,w2))
+
+
+OUTPUT w1,w2,w3

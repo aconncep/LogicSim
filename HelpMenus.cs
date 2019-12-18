@@ -84,5 +84,10 @@ namespace LogicSim
                               "allows teachers/instructors to see individual progress about each student, in addition to general class data\n" +
                               "(both of which is hidden from the students).");
         }
+
+        public static void HelpReinterpret()
+        {
+            Console.WriteLine("Re-scan the HDL file and attempt to re-generate a circuit from it. Use this to re-interpret a modified HDL file without restarting the software.");
+        }
     }
 }

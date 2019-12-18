@@ -6,7 +6,7 @@ namespace LogicSim
     }
     public class Variable
     {
-        public readonly VariableType type;
+        public VariableType type;
         public readonly string Name;
         private int _value;
         public int Value
@@ -33,7 +33,7 @@ namespace LogicSim
             if (obj is Variable)
             {
                 Variable otherVar = (Variable) obj;
-                return otherVar.Name == Name && otherVar.Value == Value;
+                return otherVar.Name == Name;
             }
             return false;
         }

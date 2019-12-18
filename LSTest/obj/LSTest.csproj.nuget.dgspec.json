@@ -1,0 +1,128 @@
+{
+  "format": 1,
+  "restore": {
+    "/Users/austincepalia/Desktop/LogicSim/LSTest/LSTest.csproj": {}
+  },
+  "projects": {
+    "/Users/austincepalia/Desktop/LogicSim/LogicSim.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Users/austincepalia/Desktop/LogicSim/LogicSim.csproj",
+        "projectName": "LogicSim",
+        "projectPath": "/Users/austincepalia/Desktop/LogicSim/LogicSim.csproj",
+        "packagesPath": "/Users/austincepalia/.nuget/packages/",
+        "outputPath": "/Users/austincepalia/Desktop/LogicSim/obj/",
+        "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "/usr/local/share/dotnet/sdk/NuGetFallbackFolder"
+        ],
+        "configFilePaths": [
+          "/Users/austincepalia/.config/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "netcoreapp2.1"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "netcoreapp2.1": {
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "netcoreapp2.1": {
+          "dependencies": {
+            "Microsoft.NETCore.App": {
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[2.1.0, )",
+              "autoReferenced": true
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48"
+          ],
+          "assetTargetFallback": true,
+          "warn": true
+        }
+      }
+    },
+    "/Users/austincepalia/Desktop/LogicSim/LSTest/LSTest.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Users/austincepalia/Desktop/LogicSim/LSTest/LSTest.csproj",
+        "projectName": "LSTest",
+        "projectPath": "/Users/austincepalia/Desktop/LogicSim/LSTest/LSTest.csproj",
+        "packagesPath": "/Users/austincepalia/.nuget/packages/",
+        "outputPath": "/Users/austincepalia/Desktop/LogicSim/LSTest/obj/",
+        "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "/usr/local/share/dotnet/sdk/NuGetFallbackFolder"
+        ],
+        "configFilePaths": [
+          "/Users/austincepalia/.config/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "netcoreapp3.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "netcoreapp3.0": {
+            "projectReferences": {
+              "/Users/austincepalia/Desktop/LogicSim/LogicSim.csproj": {
+                "projectPath": "/Users/austincepalia/Desktop/LogicSim/LogicSim.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "netcoreapp3.0": {
+          "dependencies": {
+            "Microsoft.NET.Test.Sdk": {
+              "target": "Package",
+              "version": "[16.2.0, )"
+            },
+            "NUnit3TestAdapter": {
+              "target": "Package",
+              "version": "[3.13.0, )"
+            },
+            "nunit": {
+              "target": "Package",
+              "version": "[3.12.0, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48"
+          ],
+          "assetTargetFallback": true,
+          "warn": true
+        }
+      }
+    }
+  }
+}

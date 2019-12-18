@@ -3,6 +3,15 @@ using System.Collections.Generic;
 
 namespace LogicSim
 {
+    enum SpecialInputs
+    {
+        INVALID,
+        EXIT
+    }
+
+    /// <summary>
+    /// Methods for all of the main functionality the program is capable of
+    /// </summary>
     public static class RunModes
     {
         /// <summary>
@@ -10,14 +19,17 @@ namespace LogicSim
         /// It populates the mainCircuit with circuit data to be used throughout the rest
         /// of the program's lifespan.
         /// </summary>
-        /// <param name="fileLines"></param>
+        /// <param name="fileLines">string array containing the file's lines</param>
         public static void GenerateCircuit(string[] fileLines)
         {
             Interpreter.CheckForMissingLines(fileLines);
             List<Variable> currentInputs = Interpreter.GetInputVariables(fileLines);
+            List<Variable> currentOutputs = Interpreter.GetOutputVariables(fileLines);
             int numInputs = currentInputs.Count;
 
             int currentComboNumber = 0;
+            
+            // cycle through binary
             for (int i = 0; i < Math.Pow(2, numInputs); i++)
             {
                 currentInputs = Interpreter.GetInputVariables(fileLines);
@@ -33,7 +45,17 @@ namespace LogicSim
                 // take the currently set inputs and return a list of local variables after interpreting the file with those inputs
                 List<Variable> currentLocals = Interpreter.Interpret(fileLines, currentInputs);
 
-                // create a new combo out of the current inputs and outputs
+
+                foreach (Variable var in currentLocals)
+                {
+                    if (currentOutputs.Contains(var))
+                    {
+                        var.type = VariableType.OUTPUT;
+                    }
+                }
+
+
+                // create a new combo out of the current inputs and locals
                 Combination completeCombo = new Combination(currentInputs, currentLocals);
 
                 // add the new combo to the circuit
@@ -43,6 +65,9 @@ namespace LogicSim
             }
         }
 
+        /// <summary>
+        /// Auto mode, which prints the entire circuit immediately
+        /// </summary>
         public static void RunAuto()
         {
             while (true)
@@ -59,11 +84,7 @@ namespace LogicSim
 
                     if (delay == 0)
                     {
-                        Console.WriteLine("Simulating circuit...");
-                        Console.WriteLine(CircuitGroup.mainCircuit);
-                        Console.WriteLine("Press any key to continue...");
-                        Console.WriteLine();
-                        Console.ReadKey();
+                        RunAutoNoDelay();
                     }
                     else
                     {
@@ -82,7 +103,22 @@ namespace LogicSim
                 }
             }
         }
+        
+        /// <summary>
+        /// Print the whole circuit with no delay in between prints
+        /// </summary>
+        public static void RunAutoNoDelay()
+        {
+            Console.WriteLine("Simulating circuit...");
+            Console.WriteLine(CircuitGroup.mainCircuit);
+            Console.WriteLine("Press any key to continue...");
+            Console.WriteLine();
+            Console.ReadKey();
+        }
 
+        /// <summary>
+        /// Manual mode, which asks for a set of inputs then prints the appropriate outputs
+        /// </summary>
         public static void RunManual()
         {
             bool cont = true;
@@ -92,30 +128,58 @@ namespace LogicSim
                 for (int i = 0; i < CircuitGroup.mainCircuit.NumInputs; i++)
                 {
                     Variable currentInput = CircuitGroup.mainCircuit.GetInputVariables()[i];
-                    int result = RunManualOnce(currentInput.Name);
-                    if (result == -2)
+                    var result = RunManualOnce(currentInput.Name);
+
+                    if (result.Equals(SpecialInputs.EXIT))
                     {
                         cont = false;
                         break;
                     }
-                    if (result == -1)
+
+                    if (result.Equals(SpecialInputs.INVALID))
                     {
-                        result = RunManualOnce(currentInput.Name);
+                        while (true)
+                        {
+                            result = RunManualOnce(currentInput.Name);
+                            if (result.Equals(SpecialInputs.EXIT))
+                            {
+                                cont = false;
+                                break; 
+                            }
+                            if (result.Equals(SpecialInputs.INVALID))
+                            {
+                                continue;
+                            }
+                            break;
+                        }
+                        
                     }
-                    newInputs.Add(new Variable(currentInput.Name, result, VariableType.INPUT));
+
+                    if (cont)
+                    {
+                        newInputs.Add(new Variable(currentInput.Name, result, VariableType.INPUT));
+                    }
+                    else
+                    {
+                        break;
+                    }
+                    
                 }
 
-                if (cont == true)
+                if (cont)
                 {
                     CircuitGroup.mainCircuit.PrintIndividualComboOutput(newInputs);
                     Console.WriteLine();
                 }
             }
-
-            
         }
 
-        public static int RunManualOnce(string variableName)
+        /// <summary>
+        /// Ask the user to set a specific input variable's value
+        /// </summary>
+        /// <param name="variableName">The name of the input variable being set</param>
+        /// <returns>The value entered by the user, or EXIT/INVALID in special cases</returns>
+        public static dynamic RunManualOnce(string variableName)
         {
             Console.Write("Enter value for input [" + variableName + "] (or x to quit): ");
             string userIn = Console.ReadLine();
@@ -124,9 +188,9 @@ namespace LogicSim
             {
                 Console.WriteLine("Returning to main menu...");
                 Console.WriteLine();
-                return -2;
+                return SpecialInputs.EXIT;
             }
-            
+
             int userInInt;
             try
             {
@@ -135,16 +199,65 @@ namespace LogicSim
             catch (Exception)
             {
                 Console.WriteLine("Invalid input. Try again.");
-                return -1;
+                return SpecialInputs.INVALID;
             }
 
             if (userInInt == 0 || userInInt == 1)
             {
                 return userInInt;
             }
+
             Console.WriteLine("Invalid input. Try again.");
-            return -1;
+            return SpecialInputs.INVALID;
+        }
+
+        /// <summary>
+        /// Steps through each input as the user presses SPACE
+        /// </summary>
+        public static void StepThroughInputs()
+        {
+            Console.WriteLine("Repeatedly press SPACE to simulate the next input combo [or x to quit]...\n");
+            Console.WriteLine(CircuitGroup.mainCircuit.GetTitleLine());
+            int idx = 0;
+            while (true)
+            {
+                if (idx == Math.Pow(2, CircuitGroup.mainCircuit.NumInputs))
+                {
+                    Console.WriteLine("\nPress any key to continue...\n");
+                    Console.ReadKey(true);
+                    break;
+                }
+                ConsoleKeyInfo userIn = Console.ReadKey(true);
+                if (userIn.Key.Equals(ConsoleKey.Spacebar))
+                {
+                    Console.WriteLine(CircuitGroup.mainCircuit.GetEntireLine(idx));
+                    idx++;
+                }
+                else if (userIn.Key.Equals(ConsoleKey.X))
+                {
+                    Console.WriteLine("\n");
+                    break;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Show all combinations that create all 0s or 1s
+        /// </summary>
+        /// <param name="outputToShow">0s or 1s</param>
+        public static void ShowOnlyOutput(int outputToShow)
+        {
+            if (outputToShow == 0 || outputToShow == 1)
+            {
+                List<Variable> desiredOutputs = new List<Variable>();
+                foreach (Variable var in CircuitGroup.mainCircuit.GetOutputs())
+                {
+                    Variable newVar = new Variable(var.Name, outputToShow, VariableType.OUTPUT);
+                    desiredOutputs.Add(newVar);
+                }
+
+                CircuitGroup.mainCircuit.PrintCombosWithOutput(desiredOutputs);
+            }
         }
     }
-    
 }

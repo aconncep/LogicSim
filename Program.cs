@@ -11,7 +11,6 @@ namespace LogicSim
             Console.WriteLine("LogicSim v3.0 by Austin Cepalia\n");
             Console.WriteLine("Looking for HDL file...");
             
-            
             if (args.Length > 0)
             {
                 try
@@ -19,7 +18,7 @@ namespace LogicSim
                     string[] lines = File.ReadAllLines(args[0]);
                     Console.WriteLine("HDL file detected.");
                     RunModes.GenerateCircuit(lines);
-                    Console.WriteLine("Successfully processed file.\n");
+                    Console.WriteLine($"Successfully processed file {args[0]} with {lines.Length} lines.\n");
                     RunFullMenu();
                 }
                 catch (InterpreterException e)
@@ -41,6 +40,10 @@ namespace LogicSim
             }
         }
 
+        /// <summary>
+        /// Display the full menu and run the method relating to the user's choice.
+        /// The full menu is shown when the software successfully generates a circuit object out of the HDL file
+        /// </summary>
         static void RunFullMenu()
         {
             while (true)
@@ -53,6 +56,11 @@ namespace LogicSim
 
                 switch (userSelection)
                 {
+                    case -1:
+                        Console.WriteLine();
+                        RunModes.RunAutoNoDelay();
+                        break;
+                    
                     case 0:
                         Console.WriteLine();
                         RunModes.RunAuto();
@@ -61,6 +69,21 @@ namespace LogicSim
                     case 1:
                         Console.WriteLine();
                         RunModes.RunManual();
+                        break;
+                    
+                    case 2:
+                        Console.WriteLine();
+                        RunModes.StepThroughInputs();
+                        break;
+                    
+                    case 4:
+                        Console.WriteLine();
+                        RunModes.ShowOnlyOutput(0);
+                        break;
+                    
+                    case 5:
+                        Console.WriteLine();
+                        RunModes.ShowOnlyOutput(1);
                         break;
                         
                     case 14:
@@ -75,6 +98,10 @@ namespace LogicSim
             }
         }
 
+        /// <summary>
+        /// Display the short menu and run the method relating to the user's choice.
+        /// The short menu is shown when the software cannot generate a circuit object out of the HDL file
+        /// </summary>
         static void RunShortMenu()
         {
             while (true)
@@ -99,12 +126,16 @@ namespace LogicSim
             }
         }
 
+        /// <summary>
+        /// Prompt the user with all the functionality they can get more info about
+        /// This is the entire fullMenu, but without the last two options 
+        /// </summary>
         static void Help()
         {
             while (true)
             {
                 var userSelection = MenuSelection.PromptWithQuestion("Which program functionality would you like to learn more about?",
-                    menuWithFile.Take(13).ToArray(), false);
+                    menuWithFile.Take(menuWithFile.Length-2).ToArray(), false);
                 if (userSelection is Selection && userSelection == Selection.QUIT)
                 {
                     Console.WriteLine("Returning to the main menu...\n");
@@ -154,6 +185,9 @@ namespace LogicSim
                     case 12:
                         HelpMenus.HelpClassroom();
                         break;
+                    case 13:
+                        HelpMenus.HelpReinterpret();
+                        break;
                 }
 
                 Console.WriteLine("\nPress any key to return to the Help menu...\n");
@@ -161,6 +195,9 @@ namespace LogicSim
             }
         }
 
+        /// <summary>
+        /// The about menu
+        /// </summary>
         static void About()
         {
             Console.WriteLine("LogicSim is a cross-platform tool for simulating combinational logic circuits. It can be used to quickly generate " +
@@ -175,11 +212,7 @@ namespace LogicSim
             Console.ReadLine();
         }
 
-        private static bool CompareArgStrings(string str1, string str2)
-        {
-            return string.Equals(str1, str2, StringComparison.OrdinalIgnoreCase);
-        }
-        
+        // A string array representing the full menu
         private static string[] menuWithFile =
         {
             "Simulate circuit (Auto)",
@@ -200,6 +233,7 @@ namespace LogicSim
             "About"
         };
         
+        // A string array representing the shortened menu
         private static string[] menuWithoutFile =
         {
             "Learn combinational logic",

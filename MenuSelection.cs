@@ -12,7 +12,6 @@ namespace LogicSim
     {
         public static dynamic PromptWithQuestion(string question, string[] selections, bool immediate=true)
         {
-
             if (selections.Length > 10)
             {
                 immediate = false;
@@ -65,7 +64,7 @@ namespace LogicSim
 
                     if (isNumeric)
                     {
-                        if (selection >= 0 && selection < selections.Length)
+                        if (selection >= -1 && selection < selections.Length)
                         {
                             return selection;
                         }

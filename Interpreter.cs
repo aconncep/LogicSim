@@ -7,7 +7,7 @@ namespace LogicSim
     public static class Interpreter
     {
         private static int currentLine; 
-        public static List<Variable> localVariables = new List<Variable>();
+        public static readonly List<Variable> localVariables = new List<Variable>();
 
         /// <summary>
         /// take in a list of input variables (with their values set) and return
@@ -115,13 +115,13 @@ namespace LogicSim
                 {
                     string variablesStr = evalLine.Substring(7, evalLine.Length - 7);
                     return new List<Variable>(BuildInputVariables(variablesStr));
-                }
+                } 
             }
 
             return null;
         }
 
-        public static List<Variable> GetOutputVariables(string[] fileLines, out int numVars)
+        public static List<Variable> GetOutputVariables(string[] fileLines)
         {
             foreach (string line in fileLines)
             {
@@ -136,11 +136,9 @@ namespace LogicSim
                 if (evalLine.StartsWith("OUTPUT ", StringComparison.CurrentCultureIgnoreCase))
                 {
                     string variablesStr = evalLine.Substring(7, evalLine.Length - 7);
-                    return BuildOutputVariables(variablesStr, out numVars);
+                    return BuildOutputVariables(variablesStr);
                 }
             }
-
-            numVars = 0;
             return null;
         }
 
@@ -189,7 +187,7 @@ namespace LogicSim
             return inputVariables;
         }
 
-        private static List<Variable> BuildOutputVariables(string inputString, out int numVars)
+        private static List<Variable> BuildOutputVariables(string inputString)
         {
             string thisVar = "";
 
@@ -230,8 +228,6 @@ namespace LogicSim
 
                 idx++;
             }
-
-            numVars = outputVariables.Count;
             return outputVariables;
         }
 
@@ -288,7 +284,7 @@ namespace LogicSim
             if (StringUtilities.DetermineOuterCommand(line) == "NOT")
             {
                 commandArgs.Add(innerCommandString);
-                if (commandArgs[0].Contains(','))
+                if (commandArgs[0].Contains(',') && !commandArgs[0].Contains('('))
                 {
                     throw new InterpreterException(currentLine, "Too many arguments passed to NOT command");
                 }
@@ -318,32 +314,39 @@ namespace LogicSim
                     {
                         throw new InterpreterException(currentLine, $"Missing argument for {line}");
                     }
-                    else if (c == "1")
-                    {
-                        commandArgs.Add("1");
-                    }
-                    else if (c == "0")
-                    {
-                        commandArgs.Add("0");
-                    }
-                    else if (GetInputVariableWithName(c, inputVariables) != null ||
-                             GetLocalVariableWithName(c) != null)
-                    {
-                        Variable inputVar = GetInputVariableWithName(c, inputVariables);
-                        Variable localVar = GetLocalVariableWithName(c);
-                        if (inputVar != null)
-                        {
-                            commandArgs.Add(inputVar.Name);
-                        }
 
-                        if (localVar != null)
-                        {
-                            commandArgs.Add(localVar.Name);
-                        }
-                    }
-                    else
+                    switch (c)
                     {
-                        throw new InterpreterException(currentLine, $"Undefined variable [{c}]");
+                        case "1":
+                            commandArgs.Add("1");
+                            break;
+                        case "0":
+                            commandArgs.Add("0");
+                            break;
+                        default:
+                        {
+                            if (GetInputVariableWithName(c, inputVariables) != null ||
+                                GetLocalVariableWithName(c) != null)
+                            {
+                                Variable inputVar = GetInputVariableWithName(c, inputVariables);
+                                Variable localVar = GetLocalVariableWithName(c);
+                                if (inputVar != null)
+                                {
+                                    commandArgs.Add(inputVar.Name);
+                                }
+
+                                if (localVar != null)
+                                {
+                                    commandArgs.Add(localVar.Name);
+                                }
+                            }
+                            else
+                            {
+                                throw new InterpreterException(currentLine, $"Undefined variable [{c}]");
+                            }
+
+                            break;
+                        }
                     }
                 }
             }
