@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace LogicSim
 {
@@ -45,11 +46,12 @@ namespace LogicSim
                 // take the currently set inputs and return a list of local variables after interpreting the file with those inputs
                 List<Variable> currentLocals = Interpreter.Interpret(fileLines, currentInputs);
 
-
+                
                 foreach (Variable var in currentLocals)
                 {
                     if (currentOutputs.Contains(var))
                     {
+                        currentOutputs[currentOutputs.IndexOf(var)].type = VariableType.USED_OUTPUT;
                         var.type = VariableType.OUTPUT;
                     }
                 }
@@ -63,6 +65,15 @@ namespace LogicSim
 
                 currentComboNumber++;
             }
+
+            foreach (Variable outputV in currentOutputs)
+            {
+                if (outputV.type != VariableType.USED_OUTPUT)
+                {
+                    Console.WriteLine($"Warning: Undeclared variable [{outputV.Name}] is marked as output. It will be ignored.");
+                }
+            }
+
         }
 
         /// <summary>
@@ -244,7 +255,7 @@ namespace LogicSim
         /// <summary>
         /// Show all combinations that create all 0s or 1s
         /// </summary>
-        /// <param name="outputToShow">0s or 1s</param>
+        /// <param name="outputToShow">0 or 1</param>
         public static void ShowOnlyOutput(int outputToShow)
         {
             if (outputToShow == 0 || outputToShow == 1)
@@ -258,6 +269,9 @@ namespace LogicSim
 
                 CircuitGroup.mainCircuit.PrintCombosWithOutput(desiredOutputs);
             }
+
+            Console.WriteLine("Press any key to continue...\n");
+            Console.ReadKey();
         }
     }
 }

@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -29,6 +30,11 @@ namespace LogicSim
             return combinations[idx].ToString();
         }
 
+        public void ClearCombinations()
+        {
+            combinations.Clear();
+        }
+
         /// <summary>
         /// Prints each combination in the circuit after a short delay
         /// </summary>
@@ -42,6 +48,7 @@ namespace LogicSim
                 Thread.Sleep(delay);
                 Console.WriteLine(combinations[i]);
             }
+            Thread.Sleep(delay);
         }
 
         /// <summary>
@@ -76,15 +83,21 @@ namespace LogicSim
         
         public void PrintCombosWithOutput(List<Variable> outputCombo)
         {
-            Console.WriteLine(GetTitleLine());
+            SortedList<int, Combination> matchingCombos = new SortedList<int, Combination>();
             int idx = 0;
+
             foreach (Combination localCombo in combinations.Values)
             {
                 bool goodSoFar = true;
                 for (int i = 0; i < outputCombo.Count; i++)
                 {
-                    if (outputCombo[i].Name != localCombo.GetInputs()[i].Name ||
-                        outputCombo[i].Value != localCombo.GetInputs()[i].Value)
+                    List<Variable> locals = localCombo.GetLocals();
+                    if (locals[i].type != VariableType.OUTPUT)
+                    {
+                        continue;
+                    }
+                    if (outputCombo[i].Name != locals[i].Name ||
+                        outputCombo[i].Value != locals[i].Value)
                     {
                         goodSoFar = false;
                         break;
@@ -93,11 +106,26 @@ namespace LogicSim
 
                 if (goodSoFar)
                 {
-                    Console.WriteLine(localCombo);
-                    break;
+                    matchingCombos.Add(idx, localCombo);
+                    
                 }
 
                 idx++;
+            }
+
+            if (matchingCombos.Count == 0)
+            {
+                Console.WriteLine("No input combinations matched.\n");
+            }
+            else
+            {
+                Console.WriteLine(GetTitleLine());
+                foreach (Combination combo in matchingCombos.Values)
+                {
+                    Console.WriteLine(combo);
+                }
+
+                Console.WriteLine($"\nDisplaying {matchingCombos.Count} input combinations.\n");
             }
         }
 
@@ -125,6 +153,20 @@ namespace LogicSim
 
         public List<Variable> GetOutputs()
         {
+            List<Variable> outputs = new List<Variable>();
+            foreach (Variable v in combinations[0].GetLocals())
+            {
+                if (v.type == VariableType.OUTPUT)
+                {
+                    outputs.Add(v);
+                }
+            }
+
+            return outputs;
+        }
+
+        public List<Variable> GetLocals()
+        {
             return combinations[0].GetLocals();
         }
     }
@@ -132,12 +174,17 @@ namespace LogicSim
     // A combination is a list of input variables and a list of the associated local variables for those inputs
     public class Combination
     {
-        private readonly List<Variable> inputs;
-        private readonly List<Variable> locals;
+        private List<Variable> inputs;
+        private List<Variable> locals;
 
         public int NumInputs => inputs.Count;
 
         public int NumOutputs => locals.Count;
+
+        public Combination()
+        {
+            
+        }
 
         public Combination(List<Variable> inputs, List<Variable> locals)
         {
@@ -148,6 +195,12 @@ namespace LogicSim
         public List<Variable> GetInputs()
         {
             return inputs;
+        }
+
+        public void SetCombo(List<Variable> inputs, List<Variable> locals)
+        {
+            this.inputs = inputs;
+            this.locals = locals;
         }
 
         /// <summary>
@@ -228,41 +281,21 @@ namespace LogicSim
             return sb.ToString();
         }
 
-        /// <summary>
-        /// Two combinations are equal if they share the same input and local variables
-        /// </summary>
-        /// <param name="obj">The other combination</param>
-        /// <returns>True/false</returns>
         public override bool Equals(object obj)
         {
             if (obj is Combination)
             {
                 Combination otherCombo = (Combination) obj;
-                
-                for (int i = 0; i < otherCombo.NumInputs; i++)
+
+                if (otherCombo.locals.SequenceEqual(locals) && otherCombo.inputs.SequenceEqual(inputs))
                 {
-                    if (otherCombo.GetInputs()[i].Name != locals[i].Name ||
-                        otherCombo.GetInputs()[i].Value != locals[i].Value)
-                    {
-                        return false;
-                    }
+                    return true;
                 }
-
-                for (int i = 0; i < otherCombo.NumOutputs; i++)
-                {
-                    if (otherCombo.GetLocals()[i].Name != locals[i].Name ||
-                        otherCombo.GetLocals()[i].Value != locals[i].Value)
-                    {
-                        return false;
-                    }
-                }
-
-
-                return true;
             }
-
             return false;
         }
+        
+        
 
         public List<Variable> GetLocals()
         {

@@ -1,0 +1,10 @@
+# Test program 4
+
+INPUTS A,B,F,E,C
+
+variable1 = AND(A,B)
+variable2 = OR(A,T)
+yeet = XNOR(A,B)
+austin = NOT(OR(C,A))
+
+OUTPUT variable1,cha-neez,yeet,variable2,austin

@@ -1,0 +1,7 @@
+# Test program 3
+
+INPUTS A,B
+
+w1 = XNOR(A,B)
+
+OUTPUT w1

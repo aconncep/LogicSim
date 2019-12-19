@@ -7,13 +7,20 @@
 
   <ItemGroup>
     <Compile Remove="LSTest\**" />
+    <Compile Remove="plantuml\**" />
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Remove="LSTest\**" />
+    <EmbeddedResource Remove="plantuml\**" />
   </ItemGroup>
 
   <ItemGroup>
     <None Remove="LSTest\**" />
+    <None Remove="plantuml\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="stdin.txt" />
   </ItemGroup>
 </Project>

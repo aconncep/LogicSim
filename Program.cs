@@ -49,6 +49,7 @@ namespace LogicSim
             while (true)
             {
                 var userSelection = MenuSelection.PromptNoQuestion(menuWithFile, false);
+                //int userSelection = 4; for debugging
                 if (userSelection is Selection && userSelection == Selection.QUIT)
                 {
                     Environment.Exit(0);

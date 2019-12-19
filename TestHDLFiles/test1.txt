@@ -1,8 +1,8 @@
-﻿# Test program
+﻿# Test program 1
 
 INPUTS A,B
 
-w1 = AND(A,B)
+w1 = AND(A,B)#just for unit test coverage 
 w2 = AND(OR(A,B),A)
 w3 = NOT(OR(0,w2))
 

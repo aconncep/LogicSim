@@ -2,7 +2,7 @@ namespace LogicSim
 {
     public enum VariableType
     {
-        INPUT,LOCAL,OUTPUT
+        INPUT,LOCAL,OUTPUT,USED_OUTPUT
     }
     public class Variable
     {
