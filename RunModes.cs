@@ -305,26 +305,35 @@ namespace LogicSim
                     {
                         Console.Write($"Hold input [{currentInputs[userSelection].Name}] at 0 or 1?: ");
                         ConsoleKeyInfo userChoice = Console.ReadKey();
-                        // check if is digit first? Hitting exception below
-
-                        if (int.Parse(userChoice.KeyChar.ToString()) != 0 && int.Parse(userChoice.KeyChar.ToString()) != 1)
+                        
+                        if (char.IsDigit(userChoice.KeyChar.ToString()[0]))
                         {
-                            Console.WriteLine("Invalid input. Try again");
+                            if (int.Parse(userChoice.KeyChar.ToString()) != 0 && int.Parse(userChoice.KeyChar.ToString()) != 1)
+                            {
+                                Console.WriteLine("Invalid input. Try again");
+                            }
+                            else
+                            {
+                                bitChoice = int.Parse(userChoice.KeyChar.ToString());
+                                break;
+                            }
                         }
                         else
                         {
-                            bitChoice = int.Parse(userChoice.KeyChar.ToString());
-                            break;
+                            Console.WriteLine("Invalid input. Try again");
                         }
                     }
                     
-                    Console.WriteLine($"Valid input! You picked {currentInputs[userSelection].Name} with bit {bitChoice}");
+                    Console.WriteLine($"\n\nHolding input {currentInputs[userSelection].Name} with bit {bitChoice}");
                     CircuitGroup.mainCircuit.PrintCombosWithHeldInput(currentInputs[userSelection], bitChoice);
                     break;
                 }
             }
-            
-            
+
+            Console.WriteLine("Press any key to continue...\n");
+            Console.ReadKey();
+
+
         }
     }
 }

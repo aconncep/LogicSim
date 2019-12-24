@@ -8,4 +8,4 @@ w3 = NOT(OR(NOT(A),w2))  # this should not be outputted
 w4 = XNOR(C,NAND(w1,w3))
 
 
-OUTPUT w1,w2,w4
+OUTPUT w1,w2,w3,w4

@@ -5220,35 +5220,37 @@
     ]
   },
   "packageFolders": {
-    "/Users/austincepalia/.nuget/packages/": {},
-    "/usr/local/share/dotnet/sdk/NuGetFallbackFolder": {}
+    "C:\\Users\\austin\\.nuget\\packages\\": {},
+    "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/austincepalia/Desktop/LogicSim/LSTest/LSTest.csproj",
+      "projectUniqueName": "C:\\Users\\austin\\RiderProjects\\LogicSim\\LSTest\\LSTest.csproj",
       "projectName": "LSTest",
-      "projectPath": "/Users/austincepalia/Desktop/LogicSim/LSTest/LSTest.csproj",
-      "packagesPath": "/Users/austincepalia/.nuget/packages/",
-      "outputPath": "/Users/austincepalia/Desktop/LogicSim/LSTest/obj/",
+      "projectPath": "C:\\Users\\austin\\RiderProjects\\LogicSim\\LSTest\\LSTest.csproj",
+      "packagesPath": "C:\\Users\\austin\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\austin\\RiderProjects\\LogicSim\\LSTest\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
-        "/usr/local/share/dotnet/sdk/NuGetFallbackFolder"
+        "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
       ],
       "configFilePaths": [
-        "/Users/austincepalia/.config/NuGet/NuGet.Config"
+        "C:\\Users\\austin\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
         "netcoreapp3.0"
       ],
       "sources": {
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
         "netcoreapp3.0": {
           "projectReferences": {
-            "/Users/austincepalia/Desktop/LogicSim/LogicSim.csproj": {
-              "projectPath": "/Users/austincepalia/Desktop/LogicSim/LogicSim.csproj"
+            "C:\\Users\\austin\\RiderProjects\\LogicSim\\LogicSim.csproj": {
+              "projectPath": "C:\\Users\\austin\\RiderProjects\\LogicSim\\LogicSim.csproj"
             }
           }
         }
@@ -5284,7 +5286,13 @@
           "net48"
         ],
         "assetTargetFallback": true,
-        "warn": true
+        "warn": true,
+        "frameworkReferences": {
+          "Microsoft.NETCore.App": {
+            "privateAssets": "all"
+          }
+        },
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.0.100\\RuntimeIdentifierGraph.json"
       }
     }
   }
