@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -128,6 +127,23 @@ namespace LogicSim
                 Console.WriteLine($"\nDisplaying {matchingCombos.Count} input combinations.\n");
             }
         }
+        
+        public void PrintCombosWithHeldInput(Variable holdVar, int bit)
+        {
+            StringBuilder sb = new StringBuilder();
+            Console.WriteLine();
+            sb.Append(combinations[0].GetTitleLine() + "\n");
+
+            foreach (int i in combinations.Keys)
+            {
+                if (combinations[i].InputHasValue(holdVar, bit))
+                {
+                    sb.Append(combinations[i] + "\n");
+                }
+            }
+
+            Console.WriteLine(sb.ToString());
+        }
 
         public List<Variable> GetInputVariables()
         {
@@ -201,6 +217,19 @@ namespace LogicSim
         {
             this.inputs = inputs;
             this.locals = locals;
+        }
+
+        public bool InputHasValue(Variable inputVar, int value)
+        {
+            foreach (Variable var in inputs)
+            {
+                if (var.Equals(inputVar) && var.Value == value)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         /// <summary>

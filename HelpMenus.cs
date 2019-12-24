@@ -87,7 +87,7 @@ namespace LogicSim
 
         public static void HelpReinterpret()
         {
-            Console.WriteLine("Re-scan the HDL file and attempt to re-generate a circuit from it. Use this to re-interpret a modified HDL file without restarting the software.");
+            Console.WriteLine("Re-scans the HDL file and attempt to re-generate a circuit from it. Use this to re-interpret a modified HDL file without restarting the software.");
         }
     }
 }

@@ -86,6 +86,11 @@ namespace LogicSim
                         Console.WriteLine();
                         RunModes.ShowOnlyOutput(1);
                         break;
+                    
+                    case 6:
+                        Console.WriteLine();
+                        RunModes.HoldInputConstant();
+                        break;
                         
                     case 14:
                         Console.WriteLine();

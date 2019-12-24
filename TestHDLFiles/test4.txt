@@ -3,7 +3,7 @@
 INPUTS A,B,F,E,C
 
 variable1 = AND(A,B)
-variable2 = OR(A,T)
+variable2 = OR(A,NAND(0,E))
 yeet = XNOR(A,B)
 austin = NOT(OR(C,A))
 

@@ -273,5 +273,58 @@ namespace LogicSim
             Console.WriteLine("Press any key to continue...\n");
             Console.ReadKey();
         }
+
+
+        public static void HoldInputConstant()
+        {
+            while (true)
+            {
+                List<Variable> currentInputs = CircuitGroup.mainCircuit.GetInputVariables();
+                string[] currentInputsSelections = new string[currentInputs.Count];
+                int i = 0;
+                foreach (Variable var in currentInputs)
+                {
+                    currentInputsSelections[i] = var.Name;
+                    i++;
+                }
+                var userSelection = MenuSelection.PromptNoQuestion(currentInputsSelections, false);
+
+                if (userSelection.Equals(Selection.QUIT))
+                {
+                    break;
+                }
+
+                if (!(userSelection >= 0) || !(userSelection < currentInputs.Count))
+                {
+                    Console.WriteLine("Invalid input. Try again.");
+                }
+                else
+                {
+                    int bitChoice = -1;
+                    while (true)
+                    {
+                        Console.Write($"Hold input [{currentInputs[userSelection].Name}] at 0 or 1?: ");
+                        ConsoleKeyInfo userChoice = Console.ReadKey();
+                        // check if is digit first? Hitting exception below
+
+                        if (int.Parse(userChoice.KeyChar.ToString()) != 0 && int.Parse(userChoice.KeyChar.ToString()) != 1)
+                        {
+                            Console.WriteLine("Invalid input. Try again");
+                        }
+                        else
+                        {
+                            bitChoice = int.Parse(userChoice.KeyChar.ToString());
+                            break;
+                        }
+                    }
+                    
+                    Console.WriteLine($"Valid input! You picked {currentInputs[userSelection].Name} with bit {bitChoice}");
+                    CircuitGroup.mainCircuit.PrintCombosWithHeldInput(currentInputs[userSelection], bitChoice);
+                    break;
+                }
+            }
+            
+            
+        }
     }
 }
