@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Threading;
 
 namespace LogicSim
@@ -7,7 +8,7 @@ namespace LogicSim
     public static class Interpreter
     {
         private static int currentLine; 
-        public static readonly List<Variable> localVariables = new List<Variable>();
+        private static readonly List<Variable> localVariables = new List<Variable>();
 
         /// <summary>
         /// take in a list of input variables (with their values set) and return
@@ -18,6 +19,16 @@ namespace LogicSim
             localVariables.Clear();
             List<Variable> localVariablesLocal = new List<Variable>();
             
+            StringBuilder sb = new StringBuilder();
+            foreach (Variable v in inputVars)
+            {
+                sb.Append(v.Name + ": " + v.Value + "  ");
+            }
+            
+            CircuitGroup.mainCircuit.TracedComputation.Add("NEW_INPUT");
+            CircuitGroup.mainCircuit.TracedComputation.Add($"\nCurrent input variables are  {sb.ToString()}\n");
+
+
             foreach (string line in fileLines)
             {
                 currentLine++;
@@ -34,11 +45,21 @@ namespace LogicSim
                 if (evalLine.Contains('='))
                 {
                     string variableName = evalLine.Substring(0, evalLine.IndexOf('=') - 1);
+                    
+                    CircuitGroup.mainCircuit.TracedComputation.Add($"Computing local variable [{variableName}]");
 
                     evalLine = StringUtilities.TrimVariableAssignment(evalLine);
+                    
+                    CircuitGroup.mainCircuit.TracedComputation.Add($"It's value is computed with {evalLine}\n");
+                    
+                    Variable newVar = new Variable(variableName,
+                        Computer.ComputeCircuit(evalLine, currentLine, inputVars), VariableType.LOCAL);
+                    
+                    CircuitGroup.mainCircuit.TracedComputation.Add($"Local variable [{variableName}] now has value {newVar.Value}\n");
 
-                    localVariablesLocal.Add(new Variable(variableName, Computer.ComputeCircuit(evalLine, currentLine, inputVars), VariableType.LOCAL));
-                    localVariables.Add(new Variable(variableName, Computer.ComputeCircuit(evalLine, currentLine, inputVars), VariableType.LOCAL));
+                    localVariablesLocal.Add(newVar);
+                    localVariables.Add(newVar);
+                    
                 }
             }
             return localVariablesLocal;

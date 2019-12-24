@@ -19,7 +19,6 @@ namespace LogicSim
                     Console.WriteLine("HDL file detected.");
                     RunModes.GenerateCircuit(lines);
                     Console.WriteLine($"Successfully processed file {args[0]} with {lines.Length} lines.\n");
-                    RunFullMenu();
                 }
                 catch (InterpreterException e)
                 {
@@ -30,6 +29,17 @@ namespace LogicSim
                     Console.WriteLine("Unable to process specified HDL file. Check file path and file contents, then run again.");
                     Console.WriteLine("Some program functionality will be unavailable.\n");
                     RunShortMenu();
+                }
+
+                try
+                {
+                    RunFullMenu();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("Something went wrong. Please restart LogicSim and try again.");
+                    Console.WriteLine("Technical Error:");
+                    Console.WriteLine(e.Message);
                 }
             }
             else
@@ -49,11 +59,10 @@ namespace LogicSim
             while (true)
             {
                 var userSelection = MenuSelection.PromptNoQuestion(menuWithFile, false);
-                //int userSelection = 4; for debugging
-                if (userSelection is Selection && userSelection == Selection.QUIT)
-                {
-                    Environment.Exit(0);
-                }
+                 if (userSelection is Selection && userSelection == Selection.QUIT)
+                 {
+                     Environment.Exit(0);
+                 }
 
                 switch (userSelection)
                 {
@@ -75,6 +84,11 @@ namespace LogicSim
                     case 2:
                         Console.WriteLine();
                         RunModes.StepThroughInputs();
+                        break;
+                    
+                    case 3:
+                        Console.WriteLine();
+                        RunModes.StepThroughCircuit();
                         break;
                     
                     case 4:

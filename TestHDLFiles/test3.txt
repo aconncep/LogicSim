@@ -2,6 +2,6 @@
 
 INPUTS A,B
 
-w1 = XNOR(A,B)
+w1 = NAND(A,B)
 
 OUTPUT w1

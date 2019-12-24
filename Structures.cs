@@ -13,6 +13,8 @@ namespace LogicSim
         private SortedList<int, Combination> combinations = new SortedList<int, Combination>();
         public int NumInputs => combinations[0].NumInputs;
         public int NumOutputs => combinations[0].NumOutputs;
+        
+        public List<string> TracedComputation = new List<string>();
 
         public void AddCombination(int position, Combination newCombo)
         {

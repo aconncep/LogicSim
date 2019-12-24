@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace LogicSim
 {
@@ -15,6 +16,7 @@ namespace LogicSim
     /// </summary>
     public static class RunModes
     {
+        private static string[] fileLines;
         /// <summary>
         /// This function is called right when the program starts and a file is found.
         /// It populates the mainCircuit with circuit data to be used throughout the rest
@@ -23,6 +25,7 @@ namespace LogicSim
         /// <param name="fileLines">string array containing the file's lines</param>
         public static void GenerateCircuit(string[] fileLines)
         {
+            RunModes.fileLines = fileLines;
             Interpreter.CheckForMissingLines(fileLines);
             List<Variable> currentInputs = Interpreter.GetInputVariables(fileLines);
             List<Variable> currentOutputs = Interpreter.GetOutputVariables(fileLines);
@@ -334,6 +337,97 @@ namespace LogicSim
             Console.ReadKey();
 
 
+        }
+
+        public static void StepThroughCircuit()
+        {
+            bool cont = true;
+            while (cont)
+            {
+                List<Variable> newInputs = new List<Variable>();
+                for (int i = 0; i < CircuitGroup.mainCircuit.NumInputs; i++)
+                {
+                    Variable currentInput = CircuitGroup.mainCircuit.GetInputVariables()[i];
+                    var result = RunManualOnce(currentInput.Name);
+
+                    if (result.Equals(SpecialInputs.EXIT))
+                    {
+                        cont = false;
+                        break;
+                    }
+
+                    if (result.Equals(SpecialInputs.INVALID))
+                    {
+                        while (true)
+                        {
+                            result = RunManualOnce(currentInput.Name);
+                            if (result.Equals(SpecialInputs.EXIT))
+                            {
+                                cont = false;
+                                break; 
+                            }
+                            if (result.Equals(SpecialInputs.INVALID))
+                            {
+                                continue;
+                            }
+                            break;
+                        }
+                        
+                    }
+
+                    if (cont)
+                    {
+                        newInputs.Add(new Variable(currentInput.Name, result, VariableType.INPUT));
+                    }
+                    else
+                    {
+                        break;
+                    }
+                    
+                }
+
+                if (cont)
+                {
+                    int startingIdx = 0;
+                    int idx = 0;
+
+                    StringBuilder sb = new StringBuilder();
+                    sb.Append("\n");
+                    foreach (Variable v in newInputs)
+                    {
+                        sb.Append(v.Name + ": " + v.Value + "  ");
+                    }
+
+                    sb.Append("\n");
+                    
+                    foreach (string str in CircuitGroup.mainCircuit.TracedComputation)
+                    {
+                        if (str.Trim().Equals($"Current input variables are  {sb.ToString().Trim()}".Trim()))
+                        {
+                            startingIdx = idx;
+                        }
+                        idx++;
+                    }
+                    
+                    
+                    for (int i = startingIdx; i < CircuitGroup.mainCircuit.TracedComputation.Count; i++)
+                    {
+                        if (CircuitGroup.mainCircuit.TracedComputation[i] == "NEW_INPUT")
+                        {
+                            break;
+                        }
+                        Console.WriteLine(CircuitGroup.mainCircuit.TracedComputation[i]);
+                    }
+                    
+                    CircuitGroup.mainCircuit.PrintIndividualComboOutput(newInputs);
+                    
+                    Console.WriteLine("Press any key to continue...\n");
+                    Console.ReadKey();
+                }
+
+            }
+
+            
         }
     }
 }
