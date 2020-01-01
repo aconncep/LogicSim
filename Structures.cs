@@ -36,6 +36,16 @@ namespace LogicSim
             combinations.Clear();
         }
 
+        public int GetTableLength()
+        {
+            return combinations.Count;
+        }
+
+        public Combination GetComboAtLine(int line)
+        {
+            return combinations[line];
+        }
+
         /// <summary>
         /// Prints each combination in the circuit after a short delay
         /// </summary>

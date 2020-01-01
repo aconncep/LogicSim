@@ -19,10 +19,25 @@ namespace LogicSim
                     Console.WriteLine("HDL file detected.");
                     RunModes.GenerateCircuit(lines);
                     Console.WriteLine($"Successfully processed file {args[0]} with {lines.Length} lines.\n");
+                    
+                    try
+                    {
+                        RunFullMenu();
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine("Something went wrong. Please restart LogicSim and try again.");
+                        Console.WriteLine("Technical Error:");
+                        Console.WriteLine(e.Message);
+                        Console.ReadKey();
+                    }
+                    
                 }
                 catch (InterpreterException e)
                 {
                     Console.WriteLine(e.Message);
+                    Console.WriteLine("Some program functionality will be unavailable.\n");
+                    RunShortMenu();
                 }
                 catch (Exception)
                 {
@@ -31,16 +46,6 @@ namespace LogicSim
                     RunShortMenu();
                 }
 
-                try
-                {
-                    RunFullMenu();
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine("Something went wrong. Please restart LogicSim and try again.");
-                    Console.WriteLine("Technical Error:");
-                    Console.WriteLine(e.Message);
-                }
             }
             else
             {
@@ -104,6 +109,11 @@ namespace LogicSim
                     case 6:
                         Console.WriteLine();
                         RunModes.HoldInputConstant();
+                        break;
+                    
+                    case 7:
+                        Console.WriteLine();
+                        RunModes.EquivalenceClasses();
                         break;
                         
                     case 14:

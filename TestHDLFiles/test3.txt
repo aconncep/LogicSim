@@ -2,6 +2,7 @@
 
 INPUTS A,B
 
-w1 = NAND(A,B)
+w1 = OR(A,1)
+w2 = AND(w1,B)
 
-OUTPUT w1
+OUTPUT w1,w2

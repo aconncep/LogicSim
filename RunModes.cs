@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks.Sources;
 
 namespace LogicSim
 {
@@ -16,7 +17,6 @@ namespace LogicSim
     /// </summary>
     public static class RunModes
     {
-        private static string[] fileLines;
         /// <summary>
         /// This function is called right when the program starts and a file is found.
         /// It populates the mainCircuit with circuit data to be used throughout the rest
@@ -25,7 +25,6 @@ namespace LogicSim
         /// <param name="fileLines">string array containing the file's lines</param>
         public static void GenerateCircuit(string[] fileLines)
         {
-            RunModes.fileLines = fileLines;
             Interpreter.CheckForMissingLines(fileLines);
             List<Variable> currentInputs = Interpreter.GetInputVariables(fileLines);
             List<Variable> currentOutputs = Interpreter.GetOutputVariables(fileLines);
@@ -428,6 +427,28 @@ namespace LogicSim
             }
 
             
+        }
+
+        public static void EquivalenceClasses()
+        {
+            Dictionary<List<Variable>, List<List<Variable>>> classes = new Dictionary<List<Variable>, List<List<Variable>>>();
+            for (int i = 0; i < CircuitGroup.mainCircuit.GetTableLength(); i++)
+            {
+                Combination currentCombo = CircuitGroup.mainCircuit.GetComboAtLine(i);
+                
+                
+                
+                if (!classes.ContainsKey(currentCombo.GetLocals()))
+                {
+                    List<List<Variable>> newVars = new List<List<Variable>>();
+                    newVars.Add(currentCombo.GetInputs());
+                    classes.Add(currentCombo.GetLocals(), newVars);
+                }
+                else
+                {
+                    classes[currentCombo.GetLocals()].Add(currentCombo.GetInputs());
+                }
+            }
         }
     }
 }

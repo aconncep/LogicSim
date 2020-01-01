@@ -1,8 +1,8 @@
 # Test program 2
 
-INPUTS A,B,C
+#INPUTS A,B,C
 
-w1 = OR(A,C)
+w1 = OR(1,C)
 w2 = AND(NOR(A,B),A)
 w3 = NOT(OR(NOT(A),w2))  # this should not be outputted
 w4 = XNOR(C,NAND(w1,w3))
